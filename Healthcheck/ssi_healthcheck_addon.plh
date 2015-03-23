@@ -1,0 +1,79 @@
+CREATE OR REPLACE PACKAGE SSI.ssi_healthcheck_addon IS
+ FUNCTION process ( i_id_vertrag    IN VARCHAR2
+                  , i_id_fzgvertrag IN VARCHAR2
+                  , i_id_object     IN tssi_journal.id_object%TYPE
+                  , i_checkoption   in varchar2 default 'ALL' )
+  RETURN db_datatype.db_returnstatus%TYPE;
+
+ FUNCTION check_rejection_positions ( i_id_seq_fzgrechnung snt.tfzgrechnung.id_seq_fzgrechnung%TYPE, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+
+ FUNCTION check_rejpos_less_listprice ( i_id_seq_fzgrechnung snt.tfzgrechnung.id_seq_fzgrechnung%TYPE, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+
+ FUNCTION check_possum_equal_header (
+              i_id_seq_fzgrechnung snt.tfzgrechnung.id_seq_fzgrechnung%TYPE
+              , i_fzgre_resumme snt.tfzgrechnung.fzgre_resumme%TYPE
+              , i_fzgre_awsumme snt.tfzgrechnung.fzgre_awsumme%TYPE
+              , i_fzgre_matnetto snt.tfzgrechnung.fzgre_matnetto%TYPE
+              , i_fzgre_sum_other snt.tfzgrechnung.fzgre_sum_other%TYPE
+              , i_fzgre_sum_rejected snt.tfzgrechnung.fzgre_sum_rejected%TYPE
+              , i_fzgre_control_state snt.tfzgrechnung.fzgre_control_state%TYPE
+              , i_id_object IN tssi_journal.id_object%TYPE
+             )
+  RETURN NUMBER;
+
+ FUNCTION check_import_protocol ( i_id_vertrag IN VARCHAR2, i_id_fzgvertrag IN VARCHAR2, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+
+ FUNCTION check_custinv_vs_price (
+             i_guid_ci IN snt.tcustomer_invoice.guid_ci%TYPE
+             , i_id_seq_fzgvc IN snt.tcustomer_invoice.id_seq_fzgvc%TYPE
+             , i_ci_amount IN snt.tcustomer_invoice.ci_amount%TYPE
+             , i_custinvtype_short_caption IN snt.tcustomer_invoice_typ.custinvtype_short_caption%TYPE
+             , i_ci_document_number snt.tcustomer_invoice.ci_document_number%TYPE
+             , i_id_vertrag IN VARCHAR2
+             , i_id_fzgvertrag IN VARCHAR2
+             , i_fzgvc_beginn IN snt.tfzgv_contracts.fzgvc_beginn%TYPE
+             , i_fzgvc_ende IN snt.tfzgv_contracts.fzgvc_ende%TYPE
+             , i_id_object IN tssi_journal.id_object%TYPE
+            )
+  RETURN NUMBER;
+
+ FUNCTION check_custinv_total (
+            i_guid_ci IN snt.tcustomer_invoice.guid_ci%TYPE
+            , i_ci_amount IN snt.tcustomer_invoice.ci_amount%TYPE
+            , i_ci_document_number snt.tcustomer_invoice.ci_document_number%TYPE
+            , i_id_vertrag IN VARCHAR2
+            , i_id_fzgvertrag IN VARCHAR2
+            , i_id_object IN tssi_journal.id_object%TYPE
+           )
+  RETURN NUMBER;
+
+ FUNCTION check_run_performance ( i_id_vertrag IN VARCHAR2, i_id_fzgvertrag IN VARCHAR2, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+ 
+ /*
+ -- FraBe 18.12.2012 MKS-118316 / 121230: check_foreign_currency wird nicht mehr hier durchgeführt, sondern in einem eigenen check sql script 
+ FUNCTION check_foreign_currency ( i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+ */
+ 
+ 
+ FUNCTION check_zurueckgefahrene_KM ( i_id_vertrag IN VARCHAR2, i_id_fzgvertrag IN VARCHAR2, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+
+ FUNCTION check_inexact_0_fzgre_values ( i_id_seq_fzgrechnung IN number, i_check_VALUE IN number, i_check_column IN VARCHAR2, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+
+ FUNCTION check_inexact_0_cinv_values (  i_id_vertrag IN VARCHAR2, i_id_fzgvertrag IN VARCHAR2, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+
+ FUNCTION check_future_ended_contracts ( i_id_vertrag IN VARCHAR2, i_id_fzgvertrag IN VARCHAR2, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+ 
+ FUNCTION check_invalid_FIN ( i_id_vertrag IN VARCHAR2, i_id_fzgvertrag IN VARCHAR2, i_id_object IN tssi_journal.id_object%TYPE )
+  RETURN NUMBER;
+  
+END ssi_healthcheck_addon;
+/

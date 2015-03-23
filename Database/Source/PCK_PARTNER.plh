@@ -1,0 +1,139 @@
+create or replace PACKAGE PCK_PARTNER is
+--
+--
+-- MKSSTART
+--
+-- $CompanyInfo $
+--
+-- $Date: 2014/03/15 09:07:31MEZ $
+--
+-- $Name: CBL_PreInt4 CBL_Wave3.2 CBL_WavePI2_Partner+Vertrag  $
+--
+-- $Revision: 1.10 $
+--
+-- $Header: 5100_Code_Base/Database/Source/PCK_PARTNER.plh 1.10 2014/03/15 09:07:31MEZ Berger, Franz (fraberg) CI_Changed  $
+--
+-- $Source: 5100_Code_Base/Database/Source/PCK_PARTNER.plh $
+--
+-- $Log: 5100_Code_Base/Database/Source/PCK_PARTNER.plh  $
+-- Revision 1.10 2014/03/15 09:07:31MEZ Berger, Franz (fraberg) 
+-- get_dealer_CoPartnerAssignment: neue  - IN parameter
+-- Revision 1.9 2014/02/06 14:26:22MEZ Berger, Franz (fraberg) 
+-- add new function get_dealer_CoPartnerAssignment
+-- Revision 1.8 2014/02/04 15:06:28MEZ Berger, Franz (fraberg) 
+-- add new function  get_CommunicationData
+-- Revision 1.7 2014/01/16 17:21:43MEZ Berger, Franz (fraberg) 
+-- expCommercialCustomer: add i_filename_cre/upd due to new wave1 customer upd logic
+-- Revision 1.6 2013/12/04 15:40:51MEZ Zimmerberger, Markus (zimmerb) 
+-- new function expDealer
+-- Revision 1.5 2013/12/03 13:43:17MEZ Berger, Franz (fraberg) 
+-- expPrivateCustomer: due to  wave1: split i_filename to i_filename_cre/upd
+-- Revision 1.4 2013/11/16 07:39:06MEZ Berger, Franz (fraberg) 
+-- move von PCK_EXPORTS:
+-- - expPrivateCustomer
+-- - expCommercialCustomer
+-- - expContactPerson
+-- - expWorkshop
+-- - expSupplier
+-- - expSalesman
+-- Revision 1.3 2013/06/24 17:57:46MESZ Berger, Franz (fraberg) 
+-- add function GET_CUST_xsi_PARTNER_TYPE
+-- Revision 1.2 2013/03/25 15:42:44MEZ Berger, Franz (fraberg) 
+-- chamge GET_PARTNER_STATE to GET_CUST_PARTNER_STATE / add GET_GAR_PARTNER_STATE
+-- Revision 1.1 2012/12/04 14:07:33MEZ Berger, Franz (fraberg) 
+-- Initial revision
+-- Member added to project /Archiv/mks/develop/ICON/5000_Construction/Product.pj
+-- Revision 1.1 2012/10/09 16:25:24MESZ Berger, Franz (fraberg)
+-- Initial revision
+-- Member added to project /Archiv/mks/develop/ICON/5000_Construction/Product.pj
+--
+-- MKSEND
+--
+-- Purpose: package für alle SiMEX - Partner berechnungs- und ersetzungs- prozeduren / funktionen
+--
+   FUNCTION GET_CUST_PARTNER_STATE
+          ( i_ID_CUSTOMER       varchar2
+          ) RETURN              varchar2;
+
+   FUNCTION GET_GAR_PARTNER_STATE
+          ( i_ID_GARAGE         integer
+          ) RETURN              varchar2;
+
+   FUNCTION GET_CUST_xsi_PARTNER_TYPE
+          ( i_ID_CUSTOMER       varchar2
+          ) RETURN              varchar2;
+
+   function get_CommunicationData
+          ( i_phoneNumber        varchar2   default null
+          , i_mobile             varchar2   default null
+          , i_faxNumber          varchar2   default null
+          , i_email              varchar2   default null
+          ) RETURN               XMLTYPE;
+
+   function get_dealer_CoPartnerAssignment
+          ( I_ID_GARAGE          TGARAGE.ID_GARAGE@SIMEX_DB_LINK%type
+          , I_SourceSystem       varchar2
+          , i_TAS_GUID           varchar2
+          , i_TIMESTAMP          TIMESTAMP
+          ) return               XMLTYPE;
+
+   FUNCTION expPrivateCustomer
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename_cre          VARCHAR2
+          , i_filename_upd          VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION expCommercialCustomer
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename_cre          VARCHAR2
+          , i_filename_upd          VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION expContactPerson
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION expWorkshop
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION expSupplier
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION expSalesman
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;          
+
+   FUNCTION expDealer
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+END PCK_PARTNER; -- Package spec
+/

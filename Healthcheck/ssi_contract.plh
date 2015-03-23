@@ -1,0 +1,18 @@
+CREATE OR REPLACE PACKAGE ssi."SSI_CONTRACT" IS
+ -------------------------------------------------------------------------------
+ FUNCTION process 
+        ( i_check_rules IN BOOLEAN
+        , i_store_data IN BOOLEAN
+        , i_init_load IN BOOLEAN DEFAULT FALSE
+        , i_errorflag IN db_datatype.db_returnstatus%TYPE DEFAULT db_const.db_success
+        , i_id_object IN tssi_journal.id_object%TYPE
+        , i_object_typ IN ssi_datatype.ssi_object_name%TYPE DEFAULT NULL
+        , i_flag_chk_sav IN VARCHAR2 DEFAULT NULL
+        , i_typ_process IN VARCHAR2 DEFAULT NULL
+        , i_addon IN VARCHAR2
+        , i_checkoption   in varchar2 default 'ALL'
+        )
+  RETURN db_datatype.db_returnstatus%TYPE;
+-------------------------------------------------------------------------------
+END ssi_contract;
+/

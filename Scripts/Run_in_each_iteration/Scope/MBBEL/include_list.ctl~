@@ -1,0 +1,10 @@
+OPTIONS (direct=TRUE , errors= 100000000000, SKIP=1 )
+LOAD DATA
+TRUNCATE
+INFILE 'ContractsWithRealEndDateBefore20110101.csv'
+INTO TABLE reiner_contracts
+fields terminated by ';'
+TRAILING NULLCOLS
+( sirius_number           "trim(:sirius_number)"     
+, datum                   "to_date(:datum,'YYYYMMDD')"      
+)

@@ -1,0 +1,32 @@
+
+
+-- oos NEW Scope B (cov: total ,  leer,  Sirius,  MIG_OOS)
+13	ADVANCE	        4132
+25	ADVANCE NEXT	  23
+17	BESTBASIC	      1254
+10	COMPACT	        1665
+16	COMPLETE	      11666
+23	CUC Warranty	  1959
+1	EXCELLENT	        25899
+20	EXTEND	        8800
+22	EXTENDPLUS	    52
+15	Extra Services	314
+14	Glass Repair	  189
+19	NNC Warranty	  16289
+18	SELECT	        4
+21	SELECTPLUS	    87
+24	SERVICE VOUCHER	636
+		                72969       (-958)
+                    
+30	MIG_OOS_ADVANCE	                                  10
+33	MIG_OOS_BESTBASIC	                                1
+28	MIG_OOS_COMPACT	                                  784
+32	MIG_OOS_COMPLETE	                                17657
+36	MIG_OOS_CUC Warranty	                            3
+26	MIG_OOS_EXCELLENT	                                16203
+35	MIG_OOS_EXTEND	                                  5
+31	MIG_OOS_Extra Services	                          3
+34	MIG_OOS_NNC Warranty	                            16
+29	MIG_OOS_XXXIndustrial Engines (No more in use)	  14
+27	MIG_OOS_XXXService Vertrag Trapo (No more in use)	7
+    		                                              34703     (+ 958)

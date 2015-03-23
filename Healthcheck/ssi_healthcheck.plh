@@ -1,0 +1,91 @@
+CREATE OR REPLACE PACKAGE SSI.ssi_healthcheck IS
+   --
+   --
+   -- MKSSTART
+   --
+   -- $CompanyInfo $
+   --
+   -- $Date: 2014/01/22 09:29:03MEZ $
+   --
+   -- $Name: CBL_PreInt4 CBL_Wave1 CBL_Wave3.2 CBL_WavePI2_Partner+Vertrag  $
+   --
+   -- $Revision: 1.5 $
+   --
+   -- $Header: 5100_Code_Base/Healthcheck/ssi_healthcheck.plh 1.5 2014/01/22 09:29:03MEZ Berger, Franz (fraberg) CI_Changed  $
+   --
+   -- $Source: 5100_Code_Base/Healthcheck/ssi_healthcheck.plh $
+   --
+   -- $Log: 5100_Code_Base/Healthcheck/ssi_healthcheck.plh  $
+   -- Revision 1.5 2014/01/22 09:29:03MEZ Berger, Franz (fraberg) 
+   -- process: rename i_scope_only to i_checkoption with default 'ALL'
+   -- Revision 1.4 2014/01/10 17:18:19MEZ Berger, Franz (fraberg) 
+   -- add IN parameter i_scope_only default 'NO' to function process
+   -- Revision 1.3 2012/11/28 16:52:29MEZ Berger, Franz (fraberg) 
+   -- add  i_filename to function tbllist / tbllistaddon / tbllistcontr
+   -- Revision 1.7 2010/05/03 16:11:59CEST Musanovic, Adnana (amusano)
+   -- A01
+   -- Revision 1.6 2010/04/12 12:11:33CEST Musanovic, Adnana (amusano)
+   -- format
+   -- Revision 1.5 2010/04/09 16:03:20CEST Musanovic, Adnana (amusano)
+   -- fertig
+   -- Revision 1.4 2010/03/12 17:24:11CET Musanovic, Adnana (amusano)
+   -- XML Generierung
+   -- Revision 1.3 2010/03/11 17:20:49CET Musanovic, Adnana (amusano)
+   -- Zwischenstand
+   -- Revision 1.2 2009/09/24 16:31:05CEST Kieninger, Tobias (tkienin)
+   -- actual status
+   -- Revision 1.1 2009/08/27 17:02:17CEST Kieninger, Tobias (tkienin)
+   -- Initial revision
+   -- Member added to project /Archiv/mks/develop/b2b/sirius/5000 Construction/product.pj
+   -- Revision 1.15 2009/01/15 13:35:26CET Kieninger, Tobias (tkienin)
+   -- kleinigkeiten
+   -- Revision 1.14 2008/11/26 20:45:30CET Drey, Franz (fdrey77)
+   -- FUNCTION get_filename eingefügt
+   -- Revision 1.13 2008/11/12 14:38:38CET Kieninger, Tobias (tkienin)
+   -- process_co um debug parameter erweitert
+   -- Revision 1.12 2008/10/29 17:34:06CET Drey, Franz (fdrey77)
+   -- In Process Parameter i_trace_target Varchar in Varchar2
+   --
+   -- MKSEND
+   --
+
+   -- 50799:1 08.10.2008 Franz Drey Parameter i_lock_type to function process_co added
+   -- 60312:1 30.09.2008 Franz Drey  Function process_co added
+   -- Revision 1.3 2008/08/07 18:43:53CEST miwetze
+   -- Member moved from 5100 Code Base/Database/_IntegrationCandidates/ssi/Logic/ssi_import.plh in project /Archiv/mks/develop/b2b/sirius/5000 Construction/product.pj to 5100 Code Base/Database/_IntegrationCandidates/Release 2.5.0/ssi/Logic/ssi_import.plh in project /Archiv/mks/develop/b2b/sirius/5000 Construction/product.pj.
+   -- Revision 1.1 2008/07/15 19:22:04CEST fdrey77
+   -- Initial revision
+   -- Member added to project /Archiv/mks/develop/b2b/sirius/5000 Construction/product.pj
+   --
+   lg_no_clear   VARCHAR2 ( 3 ) DEFAULT 'NO';
+
+   FUNCTION process ( i_id_vertrag     IN VARCHAR2 DEFAULT NULL
+                    , i_id_fzgvertrag IN VARCHAR2 DEFAULT NULL
+                    , i_debug IN VARCHAR2 DEFAULT 'NO'
+                    , i_no_clear IN VARCHAR2 DEFAULT 'NO'
+                    , i_trace_context IN VARCHAR2 DEFAULT NULL
+                    , i_trace_target IN VARCHAR2 DEFAULT 'TABLE'                                                               -- may be also 'SCREEN'
+                    , i_trace_clear IN VARCHAR2 DEFAULT 'YES'                                                     -- cleans up tracing table when run.
+                    , i_multi_contract IN NUMBER DEFAULT 0
+                    , i_addon IN VARCHAR2 DEFAULT 'YES'
+                     --, I_CHECK_BEGIN   IN OUT date
+                     --, i_journal_id number
+                    , i_checkoption      in varchar2 default 'ALL'
+                     )
+      RETURN db_datatype.db_returnstatus%TYPE;
+
+   PROCEDURE check_database ( i_checkoption VARCHAR2 DEFAULT NULL, i_addon VARCHAR2 DEFAULT 'YES' );
+
+   FUNCTION tbllist ( i_filename  varchar2 )
+      RETURN XMLTYPE;
+
+   FUNCTION tbllistcontr ( i_filename  varchar2 )
+      RETURN XMLTYPE;
+
+   FUNCTION tbllistaddon ( i_filename  varchar2 )
+      RETURN XMLTYPE;
+
+   FUNCTION whoami
+      RETURN VARCHAR2;
+END ssi_healthcheck;
+/

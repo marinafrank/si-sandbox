@@ -1,0 +1,53 @@
+
+SQL*Loader: Release 11.2.0.2.0 - Production on Do Mrz 5 10:38:09 2015
+
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+Control File:   exclude_list.ctl
+Data File:      Additional_OutOfScope.csv
+  Bad File:     Additional_OutOfScope.bad
+  Discard File:  none specified
+ 
+ (Allow all discards)
+
+Number to load: ALL
+Number to skip: 0
+Errors allowed: 1215752192
+Continuation:    none specified
+Path used:      Direct
+Silent options: FEEDBACK
+Table OUT_OF_SCOPE_CONTRACTS, loaded from every logical record.
+Insert option in effect for this table: TRUNCATE
+TRAILING NULLCOLS option in effect
+
+   Column Name                  Position   Len  Term Encl Datatype
+------------------------------ ---------- ----- ---- ---- ---------------------
+ID_VERTRAG                          FIRST     *   ;       CHARACTER            
+    SQL string for column : "trim(:ID_VERTRAG)"
+ID_FZGVERTRAG                        NEXT     *   ;       CHARACTER            
+    SQL string for column : "nvl(trim(:ID_FZGVERTRAG),'*')"
+
+
+Table OUT_OF_SCOPE_CONTRACTS:
+  7 Rows successfully loaded.
+  0 Rows not loaded due to data errors.
+  0 Rows not loaded because all WHEN clauses were failed.
+  0 Rows not loaded because all fields were null.
+
+Bind array size not used in direct path.
+Column array  rows :    5000
+Stream buffer bytes:  256000
+Read   buffer bytes: 1048576
+
+Total logical records skipped:          0
+Total logical records read:             7
+Total logical records rejected:         0
+Total logical records discarded:        0
+Total stream buffers loaded by SQL*Loader main thread:        1
+Total stream buffers loaded by SQL*Loader load thread:        0
+
+Run began on Do Mrz 05 10:38:09 2015
+Run ended on Do Mrz 05 10:38:09 2015
+
+Elapsed time was:     00:00:00.18
+CPU time was:         00:00:00.03

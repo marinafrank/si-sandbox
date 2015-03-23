@@ -1,0 +1,59 @@
+Script executed on: 05.03.2015 10:38:07
+Script executed by: SNT
+Script run on DB  : ref.s415mt217.tst
+Database Country  : MBBeLux
+Database dump date: not found
+
+"Do you want to save the changes to the DB? [Y/N] (Default N):"
+SELECTION CHOSEN: ROLLBACK
+All inactive Contracts which ended earlier than this date will be set to OutOfScope DD.MM.YYYY:
+SELECTION CHOSEN: 01.01.2011
+
+What scope will be applied? Defaulting to "A":
+SELECTION CHOSEN: A
+
+SNT password:
+
+Apply explicit IN-SCOPE List? Defaulting to N:
+SELECTION CHOSEN: N
+
+Apply explicit OUT-OF-SCOPE List? Defaulting to N:
+SELECTION CHOSEN: Y
+
+processing. please wait ...
+
+
+Loading Additional_OutOfScope.csv...
+
+
+Loading Additional_InScope.csv...
+
+
+INFO: No additional contracts to be set to IN-SCOPE explicitly (either IN-SCOPE List is empty or is overriden by OUT-OF-SCOPE List.
+new contract variant 26 / 'MIG_OOS_EXCELLENT' created for 16193 contracts.
+new contract variant 27 / 'MIG_OOS_XXXService Vertrag Trapo (No more in use)' created for 7 contracts.
+new contract variant 28 / 'MIG_OOS_COMPACT' created for 784 contracts.
+new contract variant 29 / 'MIG_OOS_XXXIndustrial Engines (No more in use)' created for 14 contracts.
+new contract variant 30 / 'MIG_OOS_ADVANCE' created for 12 contracts.
+new contract variant 31 / 'MIG_OOS_Extra Services' created for 3 contracts.
+new contract variant 32 / 'MIG_OOS_COMPLETE' created for 16713 contracts.
+new contract variant 33 / 'MIG_OOS_BESTBASIC' created for 1 contracts.
+new contract variant 34 / 'MIG_OOS_NNC Warranty' created for 16 contracts.
+new contract variant 35 / 'MIG_OOS_EXTEND' created for 5 contracts.
+new contract variant 36 / 'MIG_OOS_CUC Warranty' created for 3 contracts.
+new contract variant 37 / 'MIG_OOS_ADVANCE NEXT' created for 1 contracts.
+
+finished.
+
+DB Data not changed
+
+
+Please contact the SIRIUS support team in Ulm if any ORA- or SP2- error is listed in the logfile Set_Contracts_out_of_scope.LOG
+
+
+MANAGEMENT SUMMARY
+==================
+Dataset affected: 33752
+Data warnings   : 0
+Data errors     : 0
+System errors   : 0

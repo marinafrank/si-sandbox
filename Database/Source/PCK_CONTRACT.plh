@@ -1,0 +1,294 @@
+create or replace package PCK_CONTRACT is
+
+-- MKSSTART
+-- $CompanyInfo $
+--
+-- $Date: 2015/02/18 20:28:07MEZ $
+--
+-- $Name:  $
+--
+-- $Revision: 1.18 $
+--
+-- $Header: 5100_Code_Base/Database/Source/PCK_CONTRACT.plh 1.18 2015/02/18 20:28:07MEZ Frank, Marina (marinf) CI_Changed  $
+--
+-- $Source: 5100_Code_Base/Database/Source/PCK_CONTRACT.plh $
+--
+-- $Log: 5100_Code_Base/Database/Source/PCK_CONTRACT.plh  $
+-- Revision 1.18 2015/02/18 20:28:07MEZ Frank, Marina (marinf) 
+-- MKS-136487 Changes signatures because Vega Product Calculation was moved to cursor, so no second call to get_product_house needed.
+-- Revision 1.17 2015/02/09 13:42:37MEZ Frank, Marina (marinf) 
+-- Deleted old functions: currentNoOfVehicleContracts,IDcustLastDuration,get_CustomerContract,get_VehicleContract,expServiceOrCustomerCO,expServiceContractNEWobsolete
+-- which are not used after reimplementing contract extraction logic. Added xmlel_VehiContract.
+-- Revision 1.16 2015/01/15 11:22:38MEZ Frank, Marina (marinf) 
+-- Added xml constructor functions to make them visible to SQL Engine.
+-- Revision 1.15 2014/12/05 14:14:43MEZ Berger, Franz (fraberg) 
+-- remove expServiceContractOLD / add expServiceContractNEWobsolete
+-- Revision 1.14 2014/11/26 10:30:10MEZ Berger, Franz (fraberg) 
+-- ne menge neuer functions - und änderungen in bestehendem code aufgrund von den 2 neuen extraktionen expCustomerContract und expVehicleContract aus code vom bestehenden expServiceContract
+-- Revision 1.13 2014/09/04 10:02:08MESZ Berger, Franz (fraberg) 
+-- add new functions chk_FinEndCOstate / get_lastCO_statChgDat / get_odometerAtRealEnd
+-- Revision 1.12 2014/09/01 13:57:17MESZ Berger, Franz (fraberg) 
+-- some waveFinal changes
+-- Revision 1.11 2014/08/18 15:32:40MESZ Berger, Franz (fraberg) 
+-- function get_Product_House: add I_PH_PARAM_IN4
+-- Revision 1.10 2014/04/07 06:57:54MESZ Berger, Franz (fraberg) 
+-- some chenges within IN parameter of  function get_PriceCalcPart_Campaign
+-- Revision 1.9 2014/04/01 17:08:08MESZ Berger, Franz (fraberg) 
+-- a lot of new functions due to wave 3.2 CO
+-- Revision 1.8 2014/02/11 11:36:55MEZ Zimmerberger, Markus (zimmerb) 
+-- Add get_Used, get_Product_House, get_Product_House_Default
+-- Revision 1.7 2014/02/11 10:54:14MEZ Berger, Franz (fraberg) 
+-- new function chk_SCOPE / delete obsolete function CO_GET_PRODUCT
+-- Revision 1.6 2013/11/18 10:30:53MEZ Berger, Franz (fraberg) 
+-- move von PCK_EXPORTS:
+-- - expALL_ODOMETER
+-- Revision 1.5 2013/11/16 07:40:44MEZ Berger, Franz (fraberg) 
+-- move von PCK_EXPORTS:
+-- - expServiceContract
+-- - expALL_CONTRACTS
+-- Revision 1.4 2013/10/22 15:26:45MESZ Berger, Franz (fraberg) 
+-- - new IN parameter i_PAYM_TARGETDATE_CI within CO_REVENUE_AMOUNT
+-- - new function chk_overlapping_prices
+-- Revision 1.3 2013/06/25 14:04:43MESZ Berger, Franz (fraberg) 
+-- add  procedure ins_TFZGPREIS_SIMEX
+-- Revision 1.2 2013/06/24 17:48:53MESZ Berger, Franz (fraberg) 
+-- add some new Contract functions
+-- Revision 1.1 2013/06/11 14:46:01MESZ Zimmerberger, Markus (zimmerb) 
+-- Initial revision
+-- Member added to project /Archiv/mks/develop/ICON/5000_Construction/Product.pj
+-- MKSEND
+
+-- Purpose: package for all SiMEx - contract procedures / functions
+
+   function CO_REVENUE_AMOUNT
+          ( i_ID_VERTRAG                  varchar2
+          , i_ID_FZGVERTRAG               varchar2
+          , i_FZGVC_BEGINN                date
+          , i_FZGVC_PREL_OR_FINAL_ENDE    date
+          , i_PAYM_TARGETDATE_CI          number
+          ) return                        number;
+            
+   function chk_overlapping_prices
+          ( i_ID_VERTRAG                  varchar2
+          , i_ID_FZGVERTRAG               varchar2
+          ) return                        integer;
+
+   function ServcieCardLastPrintDate
+          ( i_GUID_CONTRACT               varchar2
+          ) return                        varchar2;
+
+   function customerFDIssuedUntil
+          ( i_ID_SEQ_FZGVC                number
+          , i_FZGVC_BEGINN                date
+          , i_FZGVC_PREL_OR_FINAL_END     date
+          , i_ID_PAYM                     number
+          ) return                        varchar2;
+
+   function nextCOindexDate
+          ( i_COS_ACTIVE                  number
+          , i_INDV_TYPE                   number
+          , i_FZGVC_IDX_NEXTDATE          date
+          ) return                        varchar2;
+
+   function MileagesDiff
+          ( i_FZGVC_PREL_OR_FINAL_ENDE_KM number
+          , i_FZGVC_ENDE_KM               number
+          , i_TYPE                        varchar2
+          ) return                        number;
+
+   function days_between
+          ( i_BEGINN                      date
+          , i_ENDE                        date
+          ) return                        number;
+
+   function PlanndCOmileage
+          ( i_FZGVC_BEGINN_KM             number
+          , i_FZGVC_ENDE_KM               number
+          ) return                        number;
+
+   function ChildCOtransferDate
+          ( i_ID_VERTRAG                  varchar2
+          , i_ID_FZGVERTRAG               varchar2
+          ) return                        varchar2;
+
+   function chk_SCOPE
+          ( I_ID_VERTRAG                   varchar2
+          , I_ID_FZGVERTRAG                varchar2
+          , I_ID_COV                       number   := null
+          ) return                         varchar2;
+
+   procedure ins_TFZGPREIS_SIMEX;
+
+   FUNCTION expALL_CONTRACTS
+          ( i_TAS_GUID          in  TTASK.TAS_GUID%type
+          , i_export_path       in  VARCHAR2
+          , i_filename          in  VARCHAR2
+          , i_TAS_MAX_NODES     in  integer
+          , o_FILE_RUNNING_NO   out integer
+          ) RETURN                  number;
+
+   FUNCTION expServiceContract
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION expCustomerContract
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION expVehicleContract
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION expALL_ODOMETER
+          ( i_TAS_GUID          TTASK.TAS_GUID%type
+          , i_export_path       VARCHAR2
+          , i_filename          VARCHAR2
+          , i_TAS_MAX_NODES     integer
+          , o_FILE_RUNNING_NO   out integer
+          ) RETURN              number;
+
+   function get_Product_House_Default
+          ( I_PH_TYPE      tproduct_house.ph_type%type
+          , I_RETURN_WHAT  varchar2 default 'PH_PARAM_OUT1'
+          ) return         varchar2;
+
+   function get_Product_House
+          ( I_PH_TYPE      tproduct_house.ph_type%type
+          , I_PH_PARAM_IN1 tproduct_house.ph_param_in1%type default null
+          , I_PH_PARAM_IN2 tproduct_house.ph_param_in2%type default null
+          , I_PH_PARAM_IN3 tproduct_house.ph_param_in3%type default null
+          , I_PH_PARAM_IN4 tproduct_house.ph_param_in3%type default null
+          , I_RETURN_WHAT  varchar2 default 'PH_PARAM_OUT1'
+          ) return         varchar2;
+
+   function get_Used
+          ( I_FZGV_ERSTZULASSUNG TFZGVERTRAG.FZGV_ERSTZULASSUNG@SIMEX_DB_LINK%type
+          , I_FZGVC_BEGINN       TFZGV_CONTRACTS.FZGVC_BEGINN@SIMEX_DB_LINK%type
+          ) return               number;
+          
+   function get_default_coverage
+          ( I_FZGVC_BEGINN       date
+          , I_FZGVC_BEGINN_KM    number
+          , I_FZGVC_ENDE         date
+          , I_FZGVC_ENDE_KM      number
+          , I_finEnd_FZGKM_DATUM date
+          , I_finEnd_FZGKM_KM    number
+          ) return               xmltype;
+
+   function get_ProductCOVERAGE
+          ( I_GUID_BUSINESS_AREA_L2   varchar2
+          , I_FZGVC_BEGINN            date
+          , I_FZGVC_BEGINN_KM         number
+          , I_FZGVC_ENDE              date
+          , I_FZGVC_ENDE_KM           number
+          , I_finEnd_FZGKM_DATUM      date
+          , I_finEnd_FZGKM_KM         number
+          , I_product                 varchar2
+          ) return                    xmltype;
+          
+   function get_ProductOPTION
+          ( I_GUID_CONTRACT           varchar2
+          , I_GUID_BUSINESS_AREA_L2   varchar2
+          , I_FZGVC_BEGINN            date
+          , I_FZGVC_BEGINN_KM         number
+          , I_FZGVC_ENDE              date
+          , I_FZGVC_ENDE_KM           number
+          , I_finEnd_FZGKM_DATUM      date
+          , I_finEnd_FZGKM_KM         number
+          , I_product                 varchar2
+          ) return                    xmltype;
+          
+   function get_SPP_product_COVERAGE
+          ( I_GUID_CONTRACT           varchar2
+          , I_ID_VERTRAG              varchar2
+          , I_ID_FZGVERTRAG           varchar2
+          , I_GUID_BUSINESS_AREA_L2   varchar2
+          , I_FZGVC_BEGINN            date
+          , I_FZGVC_BEGINN_KM         number
+          , I_FZGVC_ENDE              date
+          , I_FZGVC_ENDE_KM           number
+          , I_finEnd_FZGKM_DATUM      date
+          , I_finEnd_FZGKM_KM         number
+          , I_product                 varchar2
+          , I_einsArt_GUID_VI55AV     varchar2
+          ) return                    xmltype;
+          
+    function get_PriceCalcPart
+           ( I_XMLELEMENT_EVALNAME     varchar2
+           , I_CUSTINV_TYPE            varchar2
+           , I_PRICE_CALC_PART_AMOUNT  number
+           , I_ID_SEQ_FZGVC            TFZGPREIS.ID_SEQ_FZGVC@SIMEX_DB_LINK%type
+           , I_CUST_COST_CENTER        TCUSTOMER.CUST_COST_CENTER@SIMEX_DB_LINK%type
+           , I_CUST_SAP_NUMBER_DEBITOR TCUSTOMER.CUST_SAP_NUMBER_DEBITOR@SIMEX_DB_LINK%type
+           ) return                    xmltype;
+           
+    function get_PriceCalcPart_Campaign
+           ( I_XMLELEMENT_EVALNAME     varchar2
+           , I_CUSTINV_TYPE            varchar2
+           , I_PRICE_CALC_PART_AMOUNT  number
+           , I_ID_SEQ_FZGVC            TFZGPREIS.ID_SEQ_FZGVC@SIMEX_DB_LINK%type
+           , I_CUST_COST_CENTER        TCUSTOMER.CUST_COST_CENTER@SIMEX_DB_LINK%type
+           , I_CUST_SAP_NUMBER_DEBITOR TCUSTOMER.CUST_SAP_NUMBER_DEBITOR@SIMEX_DB_LINK%type
+           , I_campaignCode            varchar2
+           ) return                    xmltype;
+
+    function lastIndexDate
+           ( I_ID_VERTRAG              varchar2
+           , I_ID_FZGVERTRAG           varchar2
+           ) return                    varchar2;
+
+    function chk_FinEndCOstate 
+           ( I_ID_COS                  number
+           ) return                    varchar2;
+
+    function get_odometerAtRealEnd 
+           ( I_ID_VERTRAG              varchar2
+           , I_ID_FZGVERTRAG           varchar2
+           , I_ID_COS                  number
+           , I_finEnd_KM               number
+           , I_finEnd_DATE             date
+           , I_prelEnd_KM              number
+           , I_lastValidOdometer       number
+           , I_lastCO_statChgDat       date
+           ) return                    xmltype;
+
+    function get_lastCO_statChgDat
+           ( I_GUID_CONTRACT           varchar2
+           , I_FZGV_CREATED            date
+           ) return                    date;
+           
+    function xmlel_PriceCalcPart
+    ( i_xmlelement_evalname     VARCHAR2
+    , i_price_calc_part_amount  NUMBER
+    , i_STAT_FLAG               INTEGER
+    , i_cust_cost_center        TCUSTOMER.CUST_COST_CENTER@SIMEX_DB_LINK%TYPE
+    , i_cust_sap_number_debitor TCUSTOMER.CUST_SAP_NUMBER_DEBITOR@SIMEX_DB_LINK%TYPE
+    )
+    return xmltype;
+    
+    function xmlel_PriceCalcPart_Campaign
+   ( i_xmlelement_evalname     VARCHAR2
+   , i_price_calc_part_amount  NUMBER
+   , i_stat_flag               INTEGER
+   , i_cust_cost_center        TCUSTOMER.CUST_COST_CENTER@SIMEX_DB_LINK%TYPE
+   , i_cust_sap_number_debitor TCUSTOMER.CUST_SAP_NUMBER_DEBITOR@SIMEX_DB_LINK%TYPE
+   , I_campaignCode            VARCHAR2
+   )
+   return xmltype;
+   
+    FUNCTION xmlel_VehiContract(o_FILE_RUNNING_NO varchar2, p_id_vertrag VARCHAR2 DEFAULT NULL) RETURN xmltype;
+           
+END; -- Package spec
+/

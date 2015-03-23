@@ -1,0 +1,64 @@
+new contract variant 26 / 'MIG_OOS_EXCELLENT' created for 16192 contracts.
+new contract variant 27 / 'MIG_OOS_XXXService Vertrag Trapo (No more in use)' created for 7 contracts.
+new contract variant 28 / 'MIG_OOS_COMPACT' created for 784 contracts.
+new contract variant 29 / 'MIG_OOS_XXXIndustrial Engines (No more in use)' created for 14 contracts.
+new contract variant 30 / 'MIG_OOS_ADVANCE' created for 10 contracts.
+new contract variant 31 / 'MIG_OOS_Extra Services' created for 3 contracts.
+new contract variant 32 / 'MIG_OOS_COMPLETE' created for 16710 contracts.
+new contract variant 33 / 'MIG_OOS_BESTBASIC' created for 1 contracts.
+new contract variant 34 / 'MIG_OOS_NNC Warranty' created for 16 contracts.
+new contract variant 35 / 'MIG_OOS_EXTEND' created for 5 contracts.
+new contract variant 36 / 'MIG_OOS_CUC Warranty' created for 3 contracts.
+
+-- before oos
+13	ADVANCE	                                4142
+25	ADVANCE NEXT	                          23
+17	BESTBASIC	                              1255
+10	COMPACT	                                2449
+16	COMPLETE	                              29323
+23	CUC Warranty	                          1962
+1	EXCELLENT	                                42102
+20	EXTEND	                                8805
+22	EXTENDPLUS	                            52
+15	Extra Services	                        317
+14	Glass Repair	                          189
+19	NNC Warranty	                          16305
+18	SELECT	                                4
+21	SELECTPLUS	                            87
+24	SERVICE VOUCHER	                        636
+12	XXXIndustrial Engines (No more in use)	14
+4	XXXService Vertrag Trapo (No more in use)	7
+                                            107672
+
+-- oos old (cov: total 37, 10 leer, 15 Sirius, 11 MIG_OOS)
+13	ADVANCE	                                4132
+25	ADVANCE NEXT	                          23
+17	BESTBASIC	                              1254
+10	COMPACT	                                1665
+16	COMPLETE	                              12613
+23	CUC Warranty	                          1959
+1	EXCELLENT	                                25910
+20	EXTEND	                                8800
+22	EXTENDPLUS	                            52
+15	Extra Services	                        314
+14	Glass Repair	                          189
+19	NNC Warranty	                          16289
+18	SELECT	                                4
+21	SELECTPLUS	                            87
+24	SERVICE VOUCHER	                        636
+		                                        73927
+
+30	MIG_OOS_ADVANCE	                                  10
+33	MIG_OOS_BESTBASIC	                                1
+28	MIG_OOS_COMPACT	                                  784
+32	MIG_OOS_COMPLETE	                                16710
+36	MIG_OOS_CUC Warranty	                            3
+26	MIG_OOS_EXCELLENT	                                16192
+35	MIG_OOS_EXTEND	                                  5
+31	MIG_OOS_Extra Services	                          3
+34	MIG_OOS_NNC Warranty	                            16
+29	MIG_OOS_XXXIndustrial Engines (No more in use)	  14
+27	MIG_OOS_XXXService Vertrag Trapo (No more in use)	7
+		                                                  33745                                            
+
+                                                      

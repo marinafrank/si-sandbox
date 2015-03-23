@@ -1,0 +1,45 @@
+CREATE OR REPLACE PACKAGE P_JOB
+IS
+--
+--
+-- MKSSTART
+--
+-- $CompanyInfo $
+--
+-- $Date: 2012/10/09 16:24:42MESZ $
+--
+-- $Name: CBL_PreInt4 CBL_Wave1 CBL_Wave3.2 CBL_WavePI2_Partner+Vertrag PBL_INC3.2 PBL_INCREMENT3 PBL_Iteration1 PBL_Preiteration1  $
+--
+-- $Revision: 1.2 $
+--
+-- $Header: 5100_Code_Base/Database/Source/P_JOB.plh 1.2 2012/10/09 16:24:42MESZ Berger, Franz (fraberg) CI_Baselined  $
+--
+-- $Source: 5100_Code_Base/Database/Source/P_JOB.plh $
+--
+-- $Log: 5100_Code_Base/Database/Source/P_JOB.plh  $
+-- Revision 1.2 2012/10/09 16:24:42MESZ Berger, Franz (fraberg) 
+-- add chenge history
+-- Revision 1.1 2012/10/01 16:25:57MESZ Berger, Franz (fraberg) 
+-- Initial revision
+-- Member added to project /Archiv/mks/develop/ICON/5000_Construction/Product.pj
+--
+-- MKSEND
+
+-- Purpose: package für alle SiMEX jobs
+--
+-- MODIFICATION HISTORY
+-- Person      Date        Comments
+-- ---------   ----------  ------------------------------------------
+-- FraBe       01.10.2012  MKS-117502:1 creation
+
+-------------------------------------------------------------------------------
+  PROCEDURE create_job_SiMEX (i_REPEAT_INTERVAL VARCHAR2 DEFAULT 'FREQ=MINUTELY; INTERVAL=5') ;
+
+  PROCEDURE enable_job_SiMEX;
+
+  PROCEDURE disable_job_SiMEX;
+
+  PROCEDURE drop_job_SiMEX;
+
+END p_job;
+/

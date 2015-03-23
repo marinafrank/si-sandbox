@@ -1,0 +1,115 @@
+@echo off  
+ECHO ******************************************************************************
+ECHO *                                                                            *
+ECHO *       S I M E X   Configuration script                                     *
+ECHO *                                                                            *
+ECHO ******************************************************************************
+ECHO *
+ECHO *
+ECHO * Please enter VEGA CountryCode 
+SET /P VEGA_CountryCode=* (e.g.: 51331 for MBBEL)       and press [Enter]:  
+ECHO *
+ECHO * Please enter Tenant ID
+SET /P Tenant_ID=* (e.g.: 51331BE for MBBEL)     and press [Enter]:  
+ECHO *
+ECHO * Please enter name of SiMEx DB 
+SET /P SIMEX_DATABASE_NAME=* (e.g.: SiMEx-DB.server.prd)   and press [Enter]:  
+ECHO *
+ECHO * Please enter name of SiMEx DBlink 
+SET /P DBLINK_DATABASE_NAME=* (e.g.: MB-DB.server.prd)      and press [Enter]:  
+ECHO *
+SET /P SiMEx_DB_PASSWORD=* Please enter the password of SiMEx user of SiMEx DB and press [Enter]:  
+ECHO *
+SET /P DBLINK_SNT_PASSWORD=* Please enter password of SNT user of DBlink - DB    and press [Enter]:  
+ECHO *
+
+rem **********************************************************************************
+rem check eingaben
+rem **********************************************************************************
+
+IF "%VEGA_CountryCode%"=="" (
+ SET SUCCESSSTATUS=not sucessful - VEGA CountryCode
+ GOTO ENDE
+)
+IF "%Tenant_ID%"=="" (
+ SET SUCCESSSTATUS=not sucessful - Tenant ID
+ GOTO ENDE
+)
+IF "%SIMEX_DATABASE_NAME%"=="" (
+ SET SUCCESSSTATUS=not sucessful - no SiMEX DB name defined
+ GOTO ENDE
+)
+IF "%SiMEx_DB_PASSWORD%"=="" (
+ SET SUCCESSSTATUS=not sucessful - SiMEx password of SiMEx DB is missing
+ GOTO ENDE
+)
+IF "%DBLINK_DATABASE_NAME%"=="" (
+ SET SUCCESSSTATUS=not sucessful - no SiMEx DBlink name defined
+ GOTO ENDE
+)
+IF "%DBLINK_SNT_PASSWORD%"=="" (
+ SET SUCCESSSTATUS=not sucessful - SNT password of DB-Link DB is missing
+ GOTO ENDE
+)
+
+rem **********************************************************************************
+:RUN
+echo.
+echo processing. please wait ...
+echo.
+rem **********************************************************************************
+rem 1st: set unicode codepage for sqlplus
+set NLS_LANG=.AL32UTF8
+
+
+rem **********************************************************************************
+ECHO     
+ECHO *** CONFIGURING SIMEX Database 
+ECHO    
+rem **********************************************************************************
+rem 3rd set VEGA CountryCode and Tenant ID in the SiMEx DB
+rem plus start HealthCheck
+
+echo conn SiMEx/%SiMEx_DB_PASSWORD%@%SIMEX_DATABASE_NAME%                    > SiMEx_script_launcher_inkl_setup.sql
+
+echo spool SiMEx_script_launcher_inkl_setup.log                             >> SiMEx_script_launcher_inkl_setup.sql
+
+echo set echo on                                                            >> SiMEx_script_launcher_inkl_setup.sql
+echo set serveroutput on size unlimited                                     >> SiMEx_script_launcher_inkl_setup.sql
+
+echo delete from SiMEx.TSETTING where upper ( SET_ENTRY ) = 'COUNTRY_CODE'; >> SiMEx_script_launcher_inkl_setup.sql
+echo delete from SiMEx.TSETTING where upper ( SET_ENTRY ) = 'TENANTID';     >> SiMEx_script_launcher_inkl_setup.sql 
+echo insert into SiMEx.TSETTING ( SET_SECTION, SET_ENTRY, SET_VALUE ) values ( 'SETTING', 'COUNTRY_CODE', '%VEGA_CountryCode%' ); >> SiMEx_script_launcher_inkl_setup.sql
+echo insert into SiMEx.TSETTING ( SET_SECTION, SET_ENTRY, SET_VALUE ) values ( 'SETTING', 'TENANTID',     '%Tenant_ID%' );        >> SiMEx_script_launcher_inkl_setup.sql
+echo commit; >> SiMEx_script_launcher_inkl_setup.sql
+
+echo DROP DATABASE LINK SIMEX_DB_LINK; >> SiMEx_script_launcher_inkl_setup.sql
+
+echo CREATE DATABASE LINK SIMEX_DB_LINK >> SiMEx_script_launcher_inkl_setup.sql
+echo  CONNECT TO SNT >> SiMEx_script_launcher_inkl_setup.sql
+echo  IDENTIFIED BY %DBLINK_SNT_PASSWORD% >> SiMEx_script_launcher_inkl_setup.sql
+echo  USING '%DBLINK_DATABASE_NAME%'; >> SiMEx_script_launcher_inkl_setup.sql
+
+echo exit >> SiMEx_script_launcher_inkl_setup.sql
+
+sqlplus -s /nolog @SiMEx_script_launcher_inkl_setup.sql
+
+rm SiMEx_script_launcher_inkl_setup.sql
+rem -- end batch file
+
+rem **********************************************************************************
+ECHO * Upgradescript successfully executed...
+SET SUCCESSSTATUS=sucessful
+echo *
+GOTO ENDE
+
+
+:ENDE
+ECHO ******************************************************************************
+ECHO *                                                                            *
+ECHO           Script finished %SUCCESSSTATUS%                                    
+ECHO *                                                                            *
+ECHO ******************************************************************************
+SET /P EXIT_PARAMETER=*         * * * * * Press [Enter] to close. * * * * * 
+ECHO *DONE*
+

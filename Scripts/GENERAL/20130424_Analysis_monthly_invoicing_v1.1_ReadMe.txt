@@ -1,0 +1,40 @@
+===========================================================================
+= SIRIUS Check-Script for EDF - CIM                                       =
+===========================================================================
+
+Date         : 24.04.2013
+Author       : cPauzen
+
+Precondition : store 20130424_Analysis_monthly_invoicing_v1.1.sql
+               
+===========================================================================
+= Description                                                             =
+===========================================================================
+
+selects active contracts (StatisticCode = 01 or 02)
+having non monthly invoicing
+(not included 1 (monthly), 0 (none))
+contracts are in inScope - no real end date
+ 
+
+The script reports contracts which are not marked OutOfScope only.
+===========================================================================
+= To do´s                                                                 =
+===========================================================================
+
+Step  1: Open commdand window
+
+Step  2: Go to your working folder
+
+Step  3: Start sqlplus /nolog
+
+Step  4: SQL> @20130424_Analysis_monthly_invoicing_v1.1.sql
+
+Step  5: creates the report.
+         The output can be found in the created logfile 20130424_Analysis_monthly_invoicing_v1.1.lst
+
+Step  7: When the script has finished: check the generated logfile 
+         20130424_Analysis_monthly_invoicing_v1.1.lst for ORA- and SP2- entries. 
+         If at least one occured please contact the SIRIUS technical support team @Ulm. 
+         
+For questions and feedback please contact the SIRIUS technical support team @Ulm.

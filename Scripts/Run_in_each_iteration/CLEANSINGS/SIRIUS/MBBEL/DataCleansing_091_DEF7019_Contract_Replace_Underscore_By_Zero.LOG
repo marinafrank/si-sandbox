@@ -1,0 +1,17 @@
+Script executed on: 18.02.2015 12:07:50
+Script executed by: SNT
+Script run on DB  : ref.s415mt217.tst
+Database Country  : MBBeLux
+Database dump date: 01/27/2015
+This script was already executed on 18.02.2015 08:43:43
+
+This script was already executed on 18.02.2015 08:43:43
+It cannot be executed a 2nd time!
+
+DECLARE
+*
+ERROR at line 1:
+ORA-20000: ==> Script Execution cancelled <==
+ORA-06512: in Zeile 175
+
+

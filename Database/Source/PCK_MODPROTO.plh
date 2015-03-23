@@ -1,0 +1,53 @@
+CREATE OR REPLACE PACKAGE SIMEX.PCK_MODPROTO is
+--
+--
+-- MKSSTART
+--
+-- $CompanyInfo $
+--
+-- $Date: 2014/11/04 13:47:03MEZ $
+--
+-- $Name: CBL_PreInt4  $
+--
+-- $Revision: 1.2 $
+--
+-- $Header: 5100_Code_Base/Database/Source/PCK_MODPROTO.plh 1.2 2014/11/04 13:47:03MEZ fraberg CI_Changed  $
+--
+-- $Source: 5100_Code_Base/Database/Source/PCK_MODPROTO.plh $
+--
+-- $Log: 5100_Code_Base/Database/Source/PCK_MODPROTO.plh  $
+-- Revision 1.2 2014/11/04 13:47:03MEZ fraberg 
+-- - add new function get_actualValue 
+-- - add new IN parameter to function get_OldValue
+-- Revision 1.1 2014/10/30 18:42:55MEZ Zimmerberger, Markus (zimmerb) 
+-- Initial revision
+-- Member added to project /Archiv/mks/develop/ICON/5000_Construction/Product.pj
+--
+-- MKSEND
+--
+-- Purpose: package for SiMEX ModificationProtocolEntry
+--
+   FUNCTION expModProto
+          ( i_TAS_GUID              TTASK.TAS_GUID%TYPE
+          , i_export_path           VARCHAR2
+          , i_filename              VARCHAR2
+          , i_TAS_MAX_NODES         INTEGER
+          , o_FILE_RUNNING_NO   OUT INTEGER
+          ) RETURN                  NUMBER;
+
+   FUNCTION get_OldValue 
+          ( i_GUID_EXTCOS   TEXT_COS_LASTCHANGE.GUID_EXTCOS@simex_db_link%type
+          , i_GUID_CONTRACT TEXT_COS_LASTCHANGE.GUID_CONTRACT@simex_db_link%type
+          ) RETURN VARCHAR2;
+          
+   FUNCTION get_actualValue 
+          ( i_GUID_EXTCOS   TEXT_COS_LASTCHANGE.GUID_EXTCOS@simex_db_link%type
+          , i_GUID_CONTRACT TEXT_COS_LASTCHANGE.GUID_CONTRACT@simex_db_link%type
+          ) RETURN VARCHAR2;
+
+   FUNCTION get_NewValue
+          ( i_GUID_EXTCOS   TEXT_COS_LASTCHANGE.GUID_EXTCOS@simex_db_link%type
+          ) RETURN VARCHAR2;
+
+END PCK_MODPROTO; -- Package spec
+/

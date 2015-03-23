@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project version='8' encrypted='1'>
+	<steps type='0'>
+		<step action='Group'>
+			<buildfailsteps type='11'>0</buildfailsteps>
+			<continueonfail type='11'>-1</continueonfail>
+			<name>Build Sirius DbDeployment</name>
+		</step>
+		<step action='Delete Folder'>
+			<Path>%deployment_base_path%%deployment_path%</Path>
+			<Recurse type='11'>-1</Recurse>
+			<buildfailsteps type='11'>0</buildfailsteps>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Delete deployment folder</name>
+		</step>
+		<step action='Create Folder'>
+			<Path>%deployment_base_path%%deployment_path%</Path>
+			<continueonfail type='3'>1</continueonfail>
+			<description>DbSetup</description>
+			<indent type='3'>1</indent>
+			<name>Create deployment folder</name>
+		</step>
+		<step action='Delete Files'>
+			<Ext>Database.zip</Ext>
+			<LogDel type='11'>-1</LogDel>
+			<Path>%deployment_base_path%</Path>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Delete Database.zip</name>
+		</step>
+		<step action='Copy Files'>
+			<Converted type='11'>-1</Converted>
+			<Delay>15</Delay>
+			<DestDir>c:\iCON\deployment</DestDir>
+			<Ext><![CDATA[start_cre_SiMEX_DB.bat
+]]></Ext>
+			<HideOn type='11'>-1</HideOn>
+			<LogCopied type='11'>-1</LogCopied>
+			<ReadOnly type='11'>-1</ReadOnly>
+			<Restartable type='11'>-1</Restartable>
+			<Retries>10</Retries>
+			<SourceDir>%simex_mks_dir%5000_Construction\5100_Code_Base\Database\Build</SourceDir>
+			<SysOn type='11'>-1</SysOn>
+			<TBD type='11'>-1</TBD>
+			<buildfailsteps type='11'>0</buildfailsteps>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Copy Upgrade Scripts *.bat</name>
+		</step>
+		<step action='Copy Files'>
+			<Converted type='11'>-1</Converted>
+			<Delay>15</Delay>
+			<DestDir>c:\iCON\deployment\bin</DestDir>
+			<Ext><![CDATA[*.sql
+]]></Ext>
+			<HideOn type='11'>-1</HideOn>
+			<LogCopied type='11'>-1</LogCopied>
+			<ReadOnly type='11'>-1</ReadOnly>
+			<Restartable type='11'>-1</Restartable>
+			<Retries>10</Retries>
+			<SourceDir>%simex_mks_dir%5000_Construction\5100_Code_Base\Database\Build</SourceDir>
+			<SysOn type='11'>-1</SysOn>
+			<TBD type='11'>-1</TBD>
+			<buildfailsteps type='11'>0</buildfailsteps>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Copy Upgrade Scripts *.sql</name>
+		</step>
+		<step action='Copy Files'>
+			<Converted type='11'>-1</Converted>
+			<Delay>15</Delay>
+			<DestDir>c:\iCON\deployment\bin\misc</DestDir>
+			<Ext>SiMEX_create_TS_and_USER.sql</Ext>
+			<HideOn type='11'>-1</HideOn>
+			<LogCopied type='11'>-1</LogCopied>
+			<ReadOnly type='11'>-1</ReadOnly>
+			<Restartable type='11'>-1</Restartable>
+			<Retries>10</Retries>
+			<SourceDir>%simex_mks_dir%5000_Construction\5100_Code_Base\Database\misc</SourceDir>
+			<SysOn type='11'>-1</SysOn>
+			<TBD type='11'>-1</TBD>
+			<buildfailsteps type='11'>0</buildfailsteps>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Create_TS_and_users</name>
+		</step>
+		<step action='Copy Files'>
+			<Converted type='11'>-1</Converted>
+			<Delay>15</Delay>
+			<DestDir>c:\iCON\deployment\bin</DestDir>
+			<Ext><![CDATA[setup_structure_SiMEX.sql
+]]></Ext>
+			<HideOn type='11'>-1</HideOn>
+			<LogCopied type='11'>-1</LogCopied>
+			<ReadOnly type='11'>-1</ReadOnly>
+			<Restartable type='11'>-1</Restartable>
+			<Retries>10</Retries>
+			<SourceDir>%simex_mks_dir%5000_Construction\5100_Code_Base\Database\Model\generated</SourceDir>
+			<SysOn type='11'>-1</SysOn>
+			<TBD type='11'>-1</TBD>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Copy PowerDesigner generated Scripts</name>
+		</step>
+		<step action='Copy Files'>
+			<Converted type='11'>-1</Converted>
+			<Delay>15</Delay>
+			<DestDir>c:\iCON\deployment\bin</DestDir>
+			<Ext><![CDATA[*.sql
+*.plb
+*.plh]]></Ext>
+			<HideOn type='11'>-1</HideOn>
+			<LogCopied type='11'>-1</LogCopied>
+			<ReadOnly type='11'>-1</ReadOnly>
+			<Restartable type='11'>-1</Restartable>
+			<Retries>10</Retries>
+			<SourceDir>%simex_mks_dir%5000_Construction\5100_Code_Base\Database\Source</SourceDir>
+			<SysOn type='11'>-1</SysOn>
+			<TBD type='11'>-1</TBD>
+			<buildfailsteps type='11'>0</buildfailsteps>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Copy SiMEX packages</name>
+		</step>
+		<step action='Copy Files'>
+			<Converted type='11'>-1</Converted>
+			<Delay>15</Delay>
+			<DestDir>%deployment_base_path%%deployment_path%bin\misc</DestDir>
+			<Ext><![CDATA[Script_10RBO_Parameter.sql
+create_scheduler_jobs.sql
+disable_scheduler.sql
+enable_scheduler.sql
+reset_expired_users.sql
+AFTER_DDL_STATEMENT.sql]]></Ext>
+			<HideOn type='11'>-1</HideOn>
+			<LogCopied type='11'>-1</LogCopied>
+			<ReadOnly type='11'>-1</ReadOnly>
+			<Restartable type='11'>-1</Restartable>
+			<Retries>10</Retries>
+			<SourceDir>%simex_mks_dir%5000_Construction\5100_Code_Base\Database\misc</SourceDir>
+			<SysOn type='11'>-1</SysOn>
+			<TBD type='11'>-1</TBD>
+			<buildfailsteps type='11'>0</buildfailsteps>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name><![CDATA[Miscs-> Miscs]]></name>
+		</step>
+		<step action='Copy Files'>
+			<Converted type='11'>-1</Converted>
+			<Delay>15</Delay>
+			<DestDir>%deployment_base_path%%deployment_path%bin\Basedata\DAG</DestDir>
+			<Ext>load_SiMEX_basedata.sql</Ext>
+			<Incremental type='11'>-1</Incremental>
+			<LogCopied type='11'>-1</LogCopied>
+			<ReadOnly type='11'>-1</ReadOnly>
+			<Retries>10</Retries>
+			<SourceDir>%simex_mks_dir%5000_Construction\5100_Code_Base\Database\Basedata\DAG</SourceDir>
+			<TBD type='11'>-1</TBD>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Copy Basedata sql</name>
+		</step>
+		<step action='ZIP Files'>
+			<Action type='3'>2</Action>
+			<Compression>5</Compression>
+			<Dest>%deployment_base_path%Database.zip</Dest>
+			<Ext>*.*</Ext>
+			<Hidden type='11'>-1</Hidden>
+			<LogDetail type='11'>-1</LogDetail>
+			<Recurse type='11'>-1</Recurse>
+			<Source>%deployment_base_path%%deployment_path%</Source>
+			<buildfailsteps type='11'>0</buildfailsteps>
+			<continueonfail type='3'>1</continueonfail>
+			<indent type='3'>1</indent>
+			<name>Create Database.zip</name>
+		</step></steps>
+	<macros>
+		<macro name='deployment_path'>
+			<value>deployment\</value>
+		</macro></macros>
+</project>

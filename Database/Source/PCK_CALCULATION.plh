@@ -1,0 +1,148 @@
+CREATE OR REPLACE PACKAGE SIMEX.PCK_CALCULATION
+IS
+   --
+   --
+   -- MKSSTART
+   --
+   -- $CompanyInfo $
+   --
+   -- $Date: 2015/03/20 16:02:55MEZ $
+   --
+   -- $Name:  $
+   --
+   -- $Revision: 1.17 $
+   --
+   -- $Header: 5100_Code_Base/Database/Source/PCK_CALCULATION.plh 1.17 2015/03/20 16:02:55MEZ Frank, Marina (marinf) CI_Changed  $
+   --
+   -- $Source: 5100_Code_Base/Database/Source/PCK_CALCULATION.plh $
+   --
+   -- $Log: 5100_Code_Base/Database/Source/PCK_CALCULATION.plh  $
+   -- Revision 1.17 2015/03/20 16:02:55MEZ Frank, Marina (marinf) 
+   -- MKS-151824:1 Added common dateTime format for xml output, exception resource_busy pragma.
+   -- Revision 1.16 2015/03/06 16:07:10MEZ Frank, Marina (marinf) 
+   -- MKS-136133 Added common Cost-related constants:types of export.
+   -- Revision 1.15 2015/02/19 16:07:05MEZ Frank, Marina (marinf) 
+   -- MKS-136487:1 Added constants for exporting Vega Mapping List
+   -- Revision 1.14 2015/02/18 17:23:44MEZ Frank, Marina (marinf) 
+   -- MKS-136397:1 Implemented contract_number_migrate, contract_number_sirius
+   -- Revision 1.13 2014/09/17 14:24:28MESZ Kieninger, Tobias (tkienin) 
+   -- Selecting Workshop or Supplier
+   -- Revision 1.12 2014/09/16 12:35:42MESZ Kieninger, Tobias (tkienin) 
+   -- merging Branch
+   -- Revision 1.11 2014/07/09 13:38:53MESZ Berger, Franz (fraberg) 
+   -- add function getCustomerAsDealer
+   -- Revision 1.10 2014/06/04 13:41:25MESZ Berger, Franz (fraberg) 
+   -- remove get_last_lic as obsolete / no longer needed
+   -- Revision 1.9 2013/11/13 15:17:51MEZ Zimmerberger, Markus (zimmerb) 
+   -- Minor changes
+   -- Revision 1.8 2013/11/13 14:36:56MEZ Zimmerberger, Markus (zimmerb) 
+   -- add get_REVENUE_AMOUNT
+   -- Revision 1.7 2013/07/25 16:26:33MESZ Kieninger, Tobias (tkienin) 
+   -- .
+   -- Revision 1.6 2013/06/24 17:47:12MESZ Berger, Franz (fraberg)
+   -- add function get_DB_NAME_of_DB_LINK
+   -- Revision 1.5 2013/04/03 14:17:20MESZ Zimmerberger, Markus (zimmerb)
+   -- New optional parameter of get_part_of_bearbeiter_kauf
+   -- Revision 1.4 2013/04/03 10:36:20MESZ Zimmerberger, Markus (zimmerb)
+   -- Add get_part_of_bearbeiter_kauf
+   -- Revision 1.3 2012/12/05 14:45:13MEZ Berger, Franz (fraberg)
+   -- add function get_setting
+   -- Revision 1.1 2012/10/09 16:25:24MESZ Berger, Franz (fraberg)
+   -- Initial revision
+   -- Member added to project /Archiv/mks/develop/ICON/5000_Construction/Product.pj
+   --
+   -- MKSEND
+   --
+   -- Purpose: package für alle SiMEX berechnungs- und ersetzungs- prozeduren / funktionen
+   --
+   -- MODIFICATION HISTORY
+   -- Person      Date        Comments
+   -- ---------   ----------  ------------------------------------------
+   -- FraBe       01.10.2012  MKS-117502:1 creation
+   -- MaZi        13.11.2013  MKS-123543:1 add get_REVENUE_AMOUNT
+   -- FraBe       04.06.2014  MKS-132838:1 remove get_last_lic as obsolete / no longer needed
+   -- FraBe       04.07.2014  MKS-132047:1 add function getCustomerAsDealer
+   -- MariF       13.02.2015  MKS-132047:1 added contract_number_sirius, contract_number_migrate, common variables
+   c_xmlDTfmt                 CONSTANT VARCHAR2(30) := 'YYYY-MM-DD"T"HH24:MI:SS';
+   c_mappsrc_Extraction       CONSTANT VARCHAR2(30) := 'Extraction';
+   c_mappsrc_Cleansing        CONSTANT VARCHAR2(30) := 'Cleansing';
+   c_msg_normal               CONSTANT VARCHAR2(50) := 'Normal icon renumbering';
+   c_errmsg_FIN               CONSTANT VARCHAR2(50) := 'Wrong FIN';
+   c_errmsg_COV               CONSTANT VARCHAR2(50) := 'Wrong contract type';
+   c_errmsg_notfound          CONSTANT VARCHAR2(50) := 'Contract not found';
+   c_errmsg_notscope          CONSTANT VARCHAR2(50) := 'Contract not in migrationscope';
+   c_exptype_Cost             CONSTANT VARCHAR2(50) := 'Cost';
+   c_exptype_CostFull         CONSTANT VARCHAR2(50) := 'CostFull';
+   c_exptype_CostCollective   CONSTANT VARCHAR2(50) := 'CostCollective';
+   
+   G_TENANT_ID                TSETTING.SET_VALUE%TYPE;
+   G_USERID                   TSETTING.SET_VALUE%TYPE;
+   G_DFLT_TENANT_CURR         TSETTING.SET_VALUE%TYPE;
+   g_expdatetime              TSETTING.SET_VALUE%TYPE;
+   e_resource_busy            EXCEPTION;
+   AlreadyLogged              EXCEPTION;
+   PRAGMA EXCEPTION_INIT      ( e_resource_busy, -00054 );
+   PRAGMA EXCEPTION_INIT      ( AlreadyLogged,   -20000 );
+   
+   FUNCTION SUBSTITUTE ( i_TAS_GUID VARCHAR2, i_LOG_TIMESTAMP TIMESTAMP, i_SUBSTITUTE_COLUMN_NAME VARCHAR2, i_SUBSTITUTE_COLUMN_VALUE VARCHAR2)
+      RETURN VARCHAR2;
+
+   FUNCTION SUBSTITUTE ( i_TAS_GUID VARCHAR2, i_LOG_TIMESTAMP TIMESTAMP, i_SUBSTITUTE_COLUMN_NAME VARCHAR2, i_SUBSTITUTE_COLUMN_VALUE NUMBER)
+      RETURN VARCHAR2;
+
+   FUNCTION SUM_COSTS ( i_TAS_GUID VARCHAR2, i_ID_VERTRAG VARCHAR2, i_ID_FZGVERTRAG VARCHAR2)
+      RETURN NUMBER;
+
+   FUNCTION SUM_REVENUES ( i_TAS_GUID VARCHAR2, i_ID_VERTRAG VARCHAR2, i_ID_FZGVERTRAG VARCHAR2)
+      RETURN NUMBER;
+
+   FUNCTION calc_boolean ( I_BOOL_COLUMN INTEGER, I_TRUE INTEGER := 1, I_FALSE INTEGER := 0)
+      RETURN VARCHAR2;
+
+   FUNCTION remove_alpha ( I_STRING_VALUE VARCHAR2)
+      RETURN VARCHAR2;
+
+   FUNCTION get_setting ( I_SECTION VARCHAR2, I_ENTRY VARCHAR2, I_DEFAULT VARCHAR2 DEFAULT NULL)
+      RETURN VARCHAR2;
+      
+   PROCEDURE set_setting ( i_section VARCHAR2, i_entry VARCHAR2, i_value VARCHAR2);      
+
+   FUNCTION get_part_of_bearbeiter_kauf ( I_VALUE VARCHAR2, I_PART NUMBER, I_DEFAULT VARCHAR2 DEFAULT NULL)
+      RETURN VARCHAR2;
+
+   FUNCTION get_DB_NAME_of_DB_LINK
+   (
+      I_DB_LINK_NAME VARCHAR2 DEFAULT 'SIMEX_DB_LINK'
+   )
+      RETURN VARCHAR2;
+      
+   FUNCTION get_revenue_amount( i_GUID_CI TCUSTOMER_INVOICE.GUID_CI@SIMEX_DB_LINK%TYPE, 
+                                i_VAT NUMBER)
+      RETURN NUMBER;
+      
+   FUNCTION getCustomerAsDealer 
+          ( I_ID_GARAGE      snt.TGARAGE.ID_GARAGE@SIMEX_DB_LINK%TYPE
+          ) return           varchar2;
+          
+   
+   FUNCTION getWorkshopOrSupplier
+          ( I_ID_GARAGE     snt.TGARAGE.ID_GARAGE@SIMEX_DB_LINK%TYPE
+          ) return varchar2;
+   /***************************************************************
+   FUNCTION contract_number_sirius: Contract Number in Sirius format
+   ****************************************************************/
+   FUNCTION contract_number_sirius(
+     i_id_vertrag                    VARCHAR2
+   , i_id_fzgvertrag                 VARCHAR2 := NULL
+   ) RETURN VARCHAR2;
+   /***************************************************************
+   FUNCTION contract_number_migrated: Contract Number in iCON format
+    e.g. contract_number_migrated('001122') >> 00001122
+         contract_number_migrated('001122','0001') >> 00001122/000001
+   ****************************************************************/
+   FUNCTION contract_number_migrate(
+     i_id_vertrag                    VARCHAR2
+   , i_id_fzgvertrag                 VARCHAR2 := NULL
+   ) RETURN VARCHAR2;
+END;                                                           -- Package spec
+/

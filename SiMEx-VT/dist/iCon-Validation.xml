@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ZBerger	2015-02-03	MKS-136332:2	createCustomerFinancialDocument: DEF7354/DEF6039 EDF-Revenue load: Revenue invoice net amount has to be greater than zero -->
+<!-- MZu		2015-02-23	MKS-xxxxxx:2	Korrektur der obigenFunktion als Inline-Aufruf, da die alte Variante untragbar langsam war -->
+<!-- MZu		2015-02-23	MKS-136135:1	Vorbereitungen für CostFull. XPATH-Fix für FullServiceContract - VehicleContractNumber -->
+<ICON-Validation>
+	<operation name="createPhysicalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>PrivateCustomer</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select
+				cust.ID_CUSTOMER
+				/* anmerkung FraBe: hab die tabellen auskommentiert, die wir nicht brauchen:               */
+				/* 1) outerJoin: von diesen braucht nicht gelesen werden, da das ergebnis da ja immer      */
+				/*    dasselbe ist, egal ob daten da sind, oder nicht. das lesen von daten kostet nur zeit */
+				/* 2) alle anderen joins ohne einschraenkung: auch da muss der join aufgehen. wenn er es   */
+				/*    nicht tut, ist das ein datenfehler, der protokolliert, bzw. behoben werden muss!     */
+			from
+				snt.TCUSTOMERTYP@simex_db_link custtyp
+				, snt.TCUSTOMER@simex_db_link    cust
+				/* , snt.TADRESS@simex_db_link      adr   */
+				/* , snt.TCOUNTRY@simex_db_link     cty   */
+				/* , snt.TZIP@simex_db_link         zip   */
+				/* , snt.TPROVINCE@simex_db_link    prov  */
+				/* , snt.TTITLE@simex_db_link       title */
+				/* , snt.TNAME@simex_db_link        name  */
+				/* , snt.TADRASSOZ@simex_db_link    ass   */
+				/* , snt.TLANGUAGE@simex_db_link    lang  */
+				/* , snt.TCURRENCY@simex_db_link    cur   */
+			where
+				custtyp.ID_CUSTYP             = cust.ID_CUSTYP
+				and custtyp.CUSTYP_COMPANY        = 1
+				and custtyp.CUSTYP_CAPTION not like 'MIG_OOS%'
+				and not exists (
+					select
+						null
+					from
+						simex.TSUBSTITUTE s
+					where
+						s.SUB_SRS_ATT_NAME   = 'WorkshopAsCustomer'
+						and s.SUB_SRS_ATT_VALUE  = cust.ID_CUSTOMER
+					)
+				/* and ass.ID_SEQ_NAME        = name.ID_SEQ_NAME(+)  */
+				/* and title.ID_TITLE(+)      = name.ID_TITLE        */ 
+				/* and ass.ID_SEQ_ADRESS      = adr.ID_SEQ_ADRESS(+) */
+				/* and prov.GUID_PROVINCE(+)  = adr.GUID_PROVINCE    */
+				/* and zip.ID_SEQ_ZIP(+)      = adr.ID_SEQ_ZIP       */
+				/* and zip.ID_COUNTRY         = cty.ID_COUNTRY(+)    */
+				/* and lang.ID_LANGUAGE       = cust.ID_LANGUAGE     */
+				/* and cur.ID_CURRENCY        = cust.ID_CURRENCY     */
+				/* and ass.ID_SEQ_ADRASSOZ    = cust.ID_SEQ_ADRASSOZ */
+			order by
+				1
+		</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+			<OwnKey name="BankAccountCode">//invocation/parameter/bankAccount/@code</OwnKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="updatePhysicalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>PrivateCustomer</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select cust.ID_CUSTOMER
+  /* anmerkung FraBe: hab die tabellen auskommentiert, die wir nicht brauchen:               */
+  /* 1) outerJoin: von diesen braucht nicht gelesen werden, da das ergebnis da ja immer      */
+  /*    dasselbe ist, egal ob daten da sind, oder nicht. das lesen von daten kostet nur zeit */
+  /* 2) alle anderen joins ohne einschraenkung: auch da muss der join aufgehen. wenn er es   */
+  /*    nicht tut, ist das ein datenfehler, der protokolliert, bzw. behoben werden muss!     */
+  from snt.TCUSTOMERTYP@simex_db_link custtyp
+     , snt.TCUSTOMER@simex_db_link    cust
+  /* , snt.TADRESS@simex_db_link      adr   */
+  /* , snt.TCOUNTRY@simex_db_link     cty   */
+  /* , snt.TZIP@simex_db_link         zip   */
+  /* , snt.TPROVINCE@simex_db_link    prov  */
+  /* , snt.TTITLE@simex_db_link       title */
+  /* , snt.TNAME@simex_db_link        name  */
+  /* , snt.TADRASSOZ@simex_db_link    ass   */
+  /* , snt.TLANGUAGE@simex_db_link    lang  */
+  /* , snt.TCURRENCY@simex_db_link    cur   */
+ where custtyp.ID_CUSTYP             = cust.ID_CUSTYP
+   and custtyp.CUSTYP_COMPANY        = 1
+   and custtyp.CUSTYP_CAPTION not like 'MIG_OOS%'
+   and not exists ( select null from simex.TSUBSTITUTE s
+                     where s.SUB_SRS_ATT_NAME   = 'WorkshopAsCustomer'
+                       and s.SUB_SRS_ATT_VALUE  = cust.ID_CUSTOMER )
+   and nvl ( cust.CUST_SAP_NUMBER_DEBITOR, '111111111' ) &lt;&gt; '111111111'
+/* and ass.ID_SEQ_NAME        = name.ID_SEQ_NAME(+)  */
+/* and title.ID_TITLE(+)      = name.ID_TITLE        */ 
+/* and ass.ID_SEQ_ADRESS      = adr.ID_SEQ_ADRESS(+) */
+/* and prov.GUID_PROVINCE(+)  = adr.GUID_PROVINCE    */
+/* and zip.ID_SEQ_ZIP(+)      = adr.ID_SEQ_ZIP       */
+/* and zip.ID_COUNTRY         = cty.ID_COUNTRY(+)    */
+/* and lang.ID_LANGUAGE       = cust.ID_LANGUAGE     */
+/* and cur.ID_CURRENCY        = cust.ID_CURRENCY     */
+/* and ass.ID_SEQ_ADRASSOZ    = cust.ID_SEQ_ADRASSOZ */
+order by 1</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+			<RemoteKey name="PartnerId" xpath="//invocation/parameter/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="PrivateCustomer" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createOrganisationalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>Workshop</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select 'W' || gar.ID_GARAGE
+  /* anmerkung FraBe: hab die tabellen auskommentiert, die wir nicht brauchen:               */
+  /* 1) outerJoin: von diesen braucht nicht gelesen werden, da das ergebnis da ja immer      */
+  /*    dasselbe ist, egal ob daten da sind, oder nicht. das lesen von daten kostet nur zeit */
+  /* 2) alle anderen joins ohne einschraenkung: auch da muss der join aufgehen. wenn er es   */
+  /*    nicht tut, ist das ein datenfehler, der protokolliert, bzw. behoben werden muss!     */
+  from snt.TGARAGE@SIMEX_DB_LINK      gar
+     , ( select c.SET_VALUE   as COUNTRY_CODE
+           from simex.TSETTING c
+          where c.SET_SECTION  = 'SETTING'
+            and c.SET_ENTRY    = 'COUNTRY_CODE' ) c
+  /* , snt.TGARAGETYP@SIMEX_DB_LINK   gartyp   */
+  /* , snt.TLANGUAGE@SIMEX_DB_LINK    lang     */
+  /* , snt.TCURRENCY@SIMEX_DB_LINK    cur      */
+  /* , snt.TADRESS@SIMEX_DB_LINK      adr      */
+  /* , snt.TCOUNTRY@SIMEX_DB_LINK     cty      */
+  /* , snt.TZIP@SIMEX_DB_LINK         zip      */
+  /* , snt.TPROVINCE@SIMEX_DB_LINK    prov     */
+  /* , snt.TNAME@SIMEX_DB_LINK        name     */
+  /* , snt.TADRASSOZ@SIMEX_DB_LINK    ass      */
+ where (( c.COUNTRY_CODE  = '51331' and ( gar.GAR_IS_SERVICE_PROVIDER  = 0 and nvl ( gar.GAR_GARNOVEGA, ' ' ) &lt;&gt; '11924' ))
+     or ( c.COUNTRY_CODE &lt;&gt; '51331' and   gar.GAR_IS_SERVICE_PROVIDER  = 0 ))
+/* and lang.ID_LANGUAGE         = gar.ID_LANGUAGE        */
+/* and cur.ID_CURRENCY          = gar.ID_CURRENCY        */
+/* and ass.ID_SEQ_ADRASSOZ      = gar.ID_SEQ_ADRASSOZ    */
+/* and ass.ID_SEQ_NAME          = name.ID_SEQ_NAME(+)    */
+/* and gartyp.ID_GARAGETYP      = gar.ID_GARAGETYP       */
+/* and ass.iD_SEQ_ADRESS        = adr.ID_SEQ_ADRESS(+)   */
+/* and prov.GUID_PROVINCE(+)    = adr.GUID_PROVINCE      */
+/* and zip.ID_SEQ_ZIP(+)        = adr.ID_SEQ_ZIP         */
+/* and zip.ID_COUNTRY           = cty.ID_COUNTRY(+)      */
+order by 1</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createOrganisationalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>Dealer</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select 'D' || g.ID_GARAGE
+  from snt.TGARAGE@SIMEX_DB_LINK g
+  /* MKS-134047:1 keine MBBEL Laenderweiche mehr, daher auch kein sel CtyCode mehr notwendig
+     , ( select c.SET_VALUE   as COUNTRY_CODE
+           from simex.TSETTING c
+          where c.SET_SECTION  = 'SETTING'
+            and c.SET_ENTRY    = 'COUNTRY_CODE' ) c */
+ where g.GAR_IS_SERVICE_PROVIDER  = 0
+   and exists ( select s.SUB_ICO_ATT_VALUE from simex.TSUBSTITUTE s
+                 where s.SUB_SRS_ATT_NAME  = 'gssnOutletOutletId'
+                   and s.SUB_SRS_ATT_VALUE = g.ID_GARAGE
+                   and s.SUB_ICO_ATT_VALUE is not null
+                 union
+                select s.SUB_ICO_ATT_VALUE from simex.TSUBSTITUTE s
+                 where s.SUB_SRS_ATT_NAME  = 'gssnOutletOutletId'
+                   and s.SUB_DEFAULT       = 1
+                   and s.SUB_ICO_ATT_VALUE is not null )
+/* MKS-134047:1 Entfernung der Einschraenkung GAR_GANOVEGA = 11924
+MBBEL Laenderweiche: eine weitere einschraenkung auf GAR_GARNOVEGA ungleich '11924'
+   and (  c.COUNTRY_CODE  &lt;&gt; '51331'
+     or ( c.COUNTRY_CODE   = '51331' and g.GAR_GARNOVEGA &lt;&gt; '11924' ))  */
+order by g.ID_GARAGE</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+			<OwnKey name="BankAccountCode">//invocation/parameter/bankAccount/@code</OwnKey>
+			<RemoteKey name="Salesman" xpath="//invocation/parameter/contactPartnerAssignment/contactPerson[@salesman=&quot;true&quot;]/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<!-- ACHTUNG: Quotes im XPATH-->
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="Salesman" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="ContactPerson" xpath="//invocation/parameter/contactPartnerAssignment[@salesman=&quot;false&quot;]/contactPerson/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<!-- ACHTUNG: Quotes im XPATH-->
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="ContactPerson" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="MainContactPerson" xpath="//invocation/parameter/mainContactPerson/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="ContactPerson" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createPhysicalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>ContactPerson</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select cust.ID_CUSTOMER || '-CP1'     as externalId
+  from snt.TCUSTOMER@SIMEX_DB_LINK    cust
+     , snt.TCUSTOMERTYP@SIMEX_DB_LINK custtyp
+     , snt.TNAME@SIMEX_DB_LINK        name
+     , snt.TADRASSOZ@SIMEX_DB_LINK    ass
+ where ass.ID_SEQ_ADRASSOZ      = cust.ID_SEQ_ADRASSOZ
+   and ass.ID_SEQ_NAME          = name.ID_SEQ_NAME(+)
+   and custtyp.ID_CUSTYP        = cust.ID_CUSTYP
+   and name.NAME_TITEL1        is not NULL
+   and custtyp.CUSTYP_COMPANY  in ( 0, 2 ) 
+   and custtyp.CUSTYP_CAPTION not like 'MIG_OOS%'
+ union
+select cust.ID_CUSTOMER || '-CP1'     as externalId
+  from snt.TCUSTOMER@SIMEX_DB_LINK    cust
+     , snt.TNAME@SIMEX_DB_LINK        name
+     , snt.TADRASSOZ@SIMEX_DB_LINK    ass
+     , simex.TSUBSTITUTE              sub
+ where ass.ID_SEQ_ADRASSOZ    = cust.ID_SEQ_ADRASSOZ
+   and ass.ID_SEQ_NAME        = name.ID_SEQ_NAME(+)
+   and name.NAME_TITEL1      is not NULL
+   and sub.SUB_SRS_ATT_NAME   = 'WorkshopAsCustomer'
+   and sub.SUB_SRS_ATT_VALUE  = cust.id_customer
+ order by 1</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createPhysicalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>Salesman</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select
+				externalId
+				,min ( GUID_CONTRACT )  as GUID_CONTRACT
+                , lastName
+                , firstName
+                /*, externalId*/
+            from (
+				select
+					GUID_CONTRACT
+                    /*--------------------------------------------------------------------------*/
+                    , ( case
+							when
+								POS_1st_COMMA &lt;&gt; 0
+                            then
+								trim ( substr ( FZGV_BEARBEITER_KAUF, 1, POS_1st_COMMA - 1 ))
+                            else
+								trim ( FZGV_BEARBEITER_KAUF )
+                        end )                                                       as lastName
+                    /*-------------------------------------------------------------------------*/
+                    , ( case
+							when
+								POS_1st_COMMA = 0
+                            then
+								null
+                            else
+								case
+									when
+										POS_1st_BRACKET_BEGIN &lt;&gt; 0
+									then
+										trim ( substr ( FZGV_BEARBEITER_KAUF, POS_1st_COMMA +1, POS_1st_BRACKET_BEGIN -1 - POS_1st_COMMA ))
+                                    else
+										trim ( substr ( FZGV_BEARBEITER_KAUF, POS_1st_COMMA +1, length ( FZGV_BEARBEITER_KAUF )))
+                                    end
+                        end )                                                        as firstName
+                    /*-------------------------------------------------------------------------*/
+                    , ( case
+							when
+								POS_1st_BRACKET_BEGIN &lt;&gt; 0
+								and POS_1st_BRACKET_END &lt;&gt; 0
+							then
+								trim ( substr ( FZGV_BEARBEITER_KAUF, POS_1st_BRACKET_BEGIN +1, POS_1st_BRACKET_END -1 - POS_1st_BRACKET_BEGIN ))
+                            else
+								'SM_' || SVpos
+                        end )                                                       as externalId
+                    /*-------------------------------------------------------------------------*/
+                from
+					( select
+						fzgv.GUID_CONTRACT
+                        , fzgv.FZGV_BEARBEITER_KAUF
+                        , fzgv.ID_VERTRAG || '/' || fzgv.ID_FZGVERTRAG         as SVpos
+                        , nvl ( instr ( fzgv.FZGV_BEARBEITER_KAUF, ',' ), 0 )  as POS_1st_COMMA
+                        , nvl ( instr ( fzgv.FZGV_BEARBEITER_KAUF, '(' ), 0 )  as POS_1st_BRACKET_BEGIN
+                        , nvl ( instr ( fzgv.FZGV_BEARBEITER_KAUF, ')' ), 0 )  as POS_1st_BRACKET_END
+                    from
+						snt.TFZGVERTRAG@SIMEX_DB_LINK      fzgv
+                        , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK cv
+                        , snt.TFZGV_CONTRACTS@SIMEX_DB_LINK  fzgvc
+                    where
+						upper ( fzgv.FZGV_BEARBEITER_KAUF ) not in ( 'SU001', 'SU002', 'SU007', 'SU008', 'SU009', 'SU011', 'SU015', 'SU017', 'SU018', 'SU020', 'GARAGE' )
+                        and fzgv.FZGV_BEARBEITER_KAUF is not null
+                        and cv.COV_CAPTION      not like 'MIG_OOS%'
+                        and cv.id_cov                  = fzgvc.id_cov
+                        and fzgv.ID_VERTRAG            = fzgvc.ID_VERTRAG
+                        and fzgv.ID_FZGVERTRAG         = fzgvc.ID_FZGVERTRAG )
+                        union
+                        select
+							null                                             as GUID_CONTRACT
+							, 'DUMMY'                                          as lastName
+                            , 'DUMMY'                                          as firstName
+                            , nvl ( (
+								select
+									SET_VALUE
+                                from
+									TSETTING
+                                where
+									SET_ENTRY = 'DEFAULTSALESPERSON'
+								)
+								, 'DDEFAULT' )									as externalId
+                               from
+								   dual
+                           )
+                     group by
+						lastName
+						, firstName
+						, externalId
+		</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createOrganisationalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>Supplier</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select ID_GARAGE
+  from snt.TGARAGE@SIMEX_DB_LINK
+ where ( GAR_IS_SERVICE_PROVIDER  = 1   or GAR_GARNOVEGA  = '11924' )
+   and     exists ( select null from TSETTING
+                     where SET_ENTRY = 'COUNTRY_CODE'
+                       and SET_VALUE = '51331' )
+ union
+select ID_GARAGE
+  from snt.TGARAGE@SIMEX_DB_LINK
+ where ( GAR_IS_SERVICE_PROVIDER  = 1  )
+   and not exists ( select null from TSETTING
+                     where SET_ENTRY = 'COUNTRY_CODE'
+                       and SET_VALUE = '51331' )
+ order by 1</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createOrganisationalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>CommercialCustomer</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select ID_CUSTOMER
+                      from snt.TCUSTOMER@SIMEX_DB_LINK      cust
+                         , snt.TCUSTOMERTYP@SIMEX_DB_LINK   custtyp
+                     where custtyp.ID_CUSTYP        = cust.ID_CUSTYP
+                       and custtyp.CUSTYP_COMPANY  in ( 0, 2 )
+                       and custtyp.CUSTYP_CAPTION NOT LIKE 'MIG_OOS%'
+                       and not exists ( select null from simex.TSUBSTITUTE s
+                                         where s.SUB_SRS_ATT_NAME   = 'WorkshopAsCustomer'
+                                           and s.SUB_SRS_ATT_VALUE  = cust.ID_CUSTOMER )    
+                     order by ID_CUSTOMER
+</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+			<OwnKey name="BankAccountCode">//invocation/parameter/bankAccount/@code</OwnKey>
+			<RemoteKey name="ContactPerson" xpath="//invocation/parameter/contactPartnerAssignment/contactPerson[@salesman=&quot;false&quot;]/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<!-- ACHTUNG: Quotes im XPATH-->
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="ContactPerson" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="MainContactPerson" xpath="//invocation/parameter/mainContactPerson/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="ContactPerson" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="updateOrganisationalPerson">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>partnerType</name>
+			<value>CommercialCustomer</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select ID_CUSTOMER
+                      from snt.TCUSTOMER@SIMEX_DB_LINK      cust
+                         , snt.TCUSTOMERTYP@SIMEX_DB_LINK   custtyp
+                     where custtyp.ID_CUSTYP        = cust.ID_CUSTYP
+                       and custtyp.CUSTYP_COMPANY  in ( 0, 2 )
+                       and custtyp.CUSTYP_CAPTION NOT LIKE 'MIG_OOS%'
+                       and not exists ( select null from simex.TSUBSTITUTE s
+                                         where s.SUB_SRS_ATT_NAME   = 'WorkshopAsCustomer'
+                                           and s.SUB_SRS_ATT_VALUE  = cust.ID_CUSTOMER )
+                       and nvl ( cust.CUST_SAP_NUMBER_DEBITOR, '111111111' ) &lt;&gt; '111111111'
+                     order by ID_CUSTOMER
+</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="PartnerId">//invocation/parameter/@externalId</OwnKey>
+			<RemoteKey name="PartnerId" xpath="//invocation/parameter/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createOrganisationalPerson" type="CommercialCustomer" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createCustomerContract">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>contractType</name>
+			<value>FullServiceContract</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select vs.ID_VERTRAG
+                      from snt.TVERTRAGSTAMM@SIMEX_DB_LINK vs
+                     where exists ( select null
+                                      from snt.TFZGV_CONTRACTS@SIMEX_DB_LINK   fzgvc
+                                         , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK  cov
+                                     where vs.ID_VERTRAG          = fzgvc.ID_VERTRAG
+                                       and cov.ID_COV             = fzgvc.ID_COV
+                                       and cov.COV_CAPTION not like 'MIG_OOS%' )
+    </ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="CustomerContractId">//invocation/parameter/@number</OwnKey>
+			<OwnKey name="CustomerContractExternalId">//invocation/parameter/@externalId</OwnKey>
+			<OwnKey name="VehicleContractNumber">//invocation/parameter/activeState/vehicleContract/@number</OwnKey>
+			<!-- Achtung, manyROWS -->
+			<OwnKey name="VehicleContractExternalNumber">//invocation/parameter/activeState/vehicleContract/@externalId</OwnKey>
+			<!-- Achtung, manyROWS -->
+			<RemoteKey name="ContractingCustomer" xpath="//invocation/parameter/contractingCustomer/@externalId" type="//invocation/parameter/contractingCustomer/@xsi:type">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="PrivateCustomer" key="PartnerId"/>
+				</Type>
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="CommercialCustomer" key="PartnerId"/>
+					<FK name="createOrganisationalPerson" type="Dealer" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="ContractingWorkshop" xpath="//invocation/parameter/activeState/vehicleContract/activeStableState/dealerAssignment/contractingWorkshop/@externalId" type="'partner_pl:OrganisationalPersonType'">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="PrivateCustomer" key="PartnerId"/>
+				</Type>
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="CommercialCustomer" key="PartnerId"/>
+					<FK name="createOrganisationalPerson" type="Dealer" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="SalesPerson" xpath="//invocation/parameter/activeState/vehicleContract/activeStableState/dealerAssignment/salesPerson/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="Salesman" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="activeCustomerContract" xpath="//invocation/parameter/activeState/vehicleContract/activeCustomerContract/@number" type="'contract_pl:CustomerContractType'">
+				<Type name="contract_pl:CustomerContractType">
+					<FK name="createCustomerContract" type="FullServiceContract" key="CustomerContractId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="BankAccountCode" xpath="//invocation/parameter/activeState/vehicleContract/activeStableState/individualVehicleContractSetting/@bankAccount" type="//invocation/parameter/contractingCustomer/@xsi:type">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="PrivateCustomer" key="BankAccountCode"/>
+				</Type>
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="CommercialCustomer" key="BankAccountCode"/>
+					<FK name="createOrganisationalPerson" type="Dealer" key="BankAccountCode"/>
+				</Type>
+			</RemoteKey>
+				<RemoteKey name="derivedFromVehicleContract" xpath="//parameter/activeState/vehicleContract/@derivedFromVehicleContract" type="'UNDEFINED'">
+				<Type name="UNDEFINED">
+					<FK name="createCustomerContract" type="FullServiceContract" key="VehicleContractNumber"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VIN" xpath="//invocation/parameter/activeState/vehicleContract/activeStableState/automotiveObject/@vin" type="'UNDEFINED'">
+				<Type name="UNDEFINED">
+					<FK name="createFinList" type="NONE" key="FIN"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createCustomerContract">
+		<ExtractFileType>XML</ExtractFileType>
+		<type>
+			<name>contractType</name>
+			<value>CustomerContract</value>
+		</type>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select vs.ID_VERTRAG
+                      from snt.TVERTRAGSTAMM@SIMEX_DB_LINK vs
+                     where exists ( select null
+                                      from snt.TFZGV_CONTRACTS@SIMEX_DB_LINK   fzgvc
+                                         , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK  cov
+                                     where vs.ID_VERTRAG          = fzgvc.ID_VERTRAG
+                                       and cov.ID_COV             = fzgvc.ID_COV
+                                       and cov.COV_CAPTION not like 'MIG_OOS%' )
+    </ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="CustomerContractId">//invocation/parameter/@number</OwnKey>
+			<OwnKey name="CustomerContractExternalId">//invocation/parameter/@externalId</OwnKey>
+			<RemoteKey name="ContractingCustomer" xpath="//invocation/parameter/contractingCustomer/@externalId" type="//invocation/parameter/contractingCustomer/@xsi:type">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="PrivateCustomer" key="PartnerId"/>
+				</Type>
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="CommercialCustomer" key="PartnerId"/>
+					<FK name="createOrganisationalPerson" type="Dealer" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createVehicleContract">
+		<ExtractFileType>XML</ExtractFileType>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select fzgv.ID_VERTRAG || '/' || fzgv.ID_FZGVERTRAG
+                      from snt.TFZGVERTRAG@SIMEX_DB_LINK fzgv
+                     where exists ( select null
+                                      from snt.TFZGV_CONTRACTS@SIMEX_DB_LINK   fzgvc
+                                         , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK  cov
+                                     where fzgv.ID_VERTRAG        = fzgvc.ID_VERTRAG
+                                       and fzgv.ID_FZGVERTRAG     = fzgvc.ID_FZGVERTRAG
+                                       and cov.ID_COV             = fzgvc.ID_COV
+                                       and cov.COV_CAPTION not like 'MIG_OOS%')
+    </ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="VehicleContractNumber">//invocation/parameter/@number</OwnKey>
+			<OwnKey name="VehicleContractExternalNumber">//invocation/parameter/@externalId</OwnKey>
+			<RemoteKey name="ContractingWorkshop" xpath="//invocation/parameter/activeStableState/dealerAssignment/contractingWorkshop/@externalId" type="'partner_pl:OrganisationalPersonType'">
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="Dealer" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="SalesPerson" xpath="//invocation/parameter/activeStableState/dealerAssignment/salesPerson/@externalId" type="'partner_pl:PhysicalPersonType'">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="Salesman" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="ActiveCustomerContract" xpath="//invocation/parameter/activeCustomerContract/@number" type="'contract_pl:CustomerContractType'">
+				<Type name="contract_pl:CustomerContractType">
+					<FK name="createCustomerContract" type="CustomerContract" key="CustomerContractId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="BankAccountCode" xpath="//invocation/parameter/activeStableState/individualVehicleContractSetting/@bankAccount" type="UNDEFINED">
+				<Type name="UNDEFINED">
+					<FK name="createOrganisationalPerson" type="CommercialCustomer" key="BankAccountCode"/>
+					<FK name="createOrganisationalPerson" type="Dealer" key="BankAccountCode"/>
+					<FK name="createPhysicalPerson" type="PrivateCustomer" key="BankAccountCode"/>
+				</Type>
+			</RemoteKey>
+				<RemoteKey name="derrivedFromVehicleContract" xpath="//parameter/@derivedFromVehicleContract" type="'UNDEFINED'">
+				<Type name="UNDEFINED">
+					<FK name="createVehicleContract" type="NONE" key="VehicleContractNumber"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VIN" xpath="//invocation/parameter/activeStableState/automotiveObject/@vin" type="'UNDEFINED'">
+				<Type name="UNDEFINED">
+					<FK name="createFinList" type="NONE" key="FIN"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="addOdometer">
+		<ExtractFileType>XML</ExtractFileType>
+		<ValidationXPath>//invocation/parameter/@mileage</ValidationXPath>
+		<ValidationSQL>  select km.FZGKM_KM
+    from snt.TFZGKMSTAND@SIMEX_DB_LINK          km
+       , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK     cvar
+       , snt.TFZGV_CONTRACTS@SIMEX_DB_LINK      fzgvc
+   where substr ( cvar.COV_CAPTION, 1, 7 ) != 'MIG_OOS'
+     and fzgvc.ID_COV           = cvar.ID_COV
+     and fzgvc.ID_SEQ_FZGVC     = km.ID_SEQ_FZGVC
+     and km.ID_SEQ_FZGKMSTAND in 
+                   ( select   ID_SEQ_FZGKMSTAND
+                       from   ( select km1.ID_SEQ_FZGKMSTAND
+                                     , km1.ID_VERTRAG
+                                     , km1.ID_FZGVERTRAG
+                                  from snt.TFZGKMSTAND@SIMEX_DB_LINK       km1
+                                 minus ( select fzg1.ID_SEQ_FZGKMSTAND_BEGIN
+                                              , fzg1.ID_VERTRAG
+                                              , fzg1.ID_FZGVERTRAG
+                                           from snt.TFZGV_CONTRACTS@SIMEX_DB_LINK fzg1
+                                          union
+                                         select fzg2.ID_SEQ_FZGKMSTAND_END
+                                              , fzg2.ID_VERTRAG
+                                              , fzg2.ID_FZGVERTRAG
+                                           from snt.TFZGV_CONTRACTS@SIMEX_DB_LINK fzg2
+                                          where fzg2.ID_SEQ_FZGKMSTAND_END = snt.GET_ID_SEQ_FZGKMSTAND_END@SIMEX_DB_LINK
+                                                                                ( snt.GET_MAX_CO@SIMEX_DB_LINK ( fzg2.ID_VERTRAG
+                                                                                                               , fzg2.ID_FZGVERTRAG ))
+                                          union
+                                         select km2.ID_SEQ_FZGKMSTAND
+                                              , km2.ID_VERTRAG
+                                              , km2.ID_FZGVERTRAG
+                                           from snt.TFZGKMSTAND@SIMEX_DB_LINK     km2
+                                              , snt.TFZGRECHNUNG@SIMEX_DB_LINK    re
+                                          where km2.FZGKM_KM      = re.FZGRE_LAUFSTRECKE
+                                            and km2.FZGKM_DATUM   = re.FZGRE_REPDATUM
+                                            and km2.ID_SEQ_FZGVC  = re.ID_SEQ_FZGVC )))
+order by km.ID_VERTRAG, km.ID_FZGVERTRAG, km.FZGKM_KM</ValidationSQL>
+		<ValidationIntegrity>
+			<RemoteKey name="VIN" xpath="//invocation/parameter[2]" type="'UNDEFINED'">
+				<Type name="UNDEFINED">
+					<FK name="createFinList" type="NONE" key="FIN"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createWorkshopFinancialDocument">
+		<ExtractFileType>XML</ExtractFileType>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select ID_SEQ_FZGRECHNUNG
+  from snt.TFZGRECHNUNG@SIMEX_DB_LINK     fzgre
+     , snt.TFZGV_CONTRACTS@SIMEX_DB_LINK  fzgvc
+     , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK cv
+     , snt.TBELEGARTEN@SIMEX_DB_LINK      bel
+ where cv.COV_CAPTION    not like 'MIG_OOS%'
+   and fzgre.ID_VERTRAG         = fzgvc.ID_VERTRAG
+   and fzgre.ID_FZGVERTRAG      = fzgvc.ID_FZGVERTRAG
+   and cv.ID_COV                = fzgvc.ID_COV
+   and fzgre.ID_IMP_TYPE   not in ( 9, 10 )
+   and fzgre.ID_BELEGART        = bel.ID_BELEGART
+   and 1                        = bel.BELART_SUM_INVOICE
+   and (  fzgre.GUID_SPCI is     null
+     or ( fzgre.GUID_SPCI is not null and exists ( select null
+                                                     from snt.TFZGRECHNUNG@SIMEX_DB_LINK fzgre1
+                                                    where fzgre.GUID_SPCI = fzgre1.GUID_SPCI
+                                                  having count(*)        = 1 )))
+ order by ID_SEQ_FZGRECHNUNG</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="WorkshopInvoiceNumber">//invocation/parameter/@externalId</OwnKey>
+			<RemoteKey name="FinancialDocumentIssuer" xpath="//invocation/parameter/financialDocumentIssuer/@externalId" type="'partner_pl:OrganisationalPersonType'">
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="Workshop" key="PartnerId"/>
+					<FK name="createOrganisationalPerson" type="Supplier" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VehicleContractNumber" xpath="//invocation/parameter[2]/costDamageCoverage/@vehicleContractNumber" type="'contract_pl:VehicleContractType'">
+				<Type name="contract_pl:VehicleContractType">
+					<FK name="createVehicleContract" type="NONE" key="VehicleContractNumber"/>
+					<FK name="createCustomerContract" type="FullServiceContract" key="VehicleContractNumber"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VIN" xpath="//invocation/parameter/costDamageCoverage/@vin" type="'UNDEFINED'">
+				<Type name="UNDEFINED">
+					<FK name="createFinList" type="NONE" key="FIN"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createWorkshopFinancialDocument">
+		<type>
+			<name>costType</name>
+			<value>FullCost</value>
+		</type>
+		<ExtractFileType>XML</ExtractFileType>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select ID_SEQ_FZGRECHNUNG
+  from snt.TFZGRECHNUNG@SIMEX_DB_LINK     fzgre
+     , snt.TFZGV_CONTRACTS@SIMEX_DB_LINK  fzgvc
+     , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK cv
+     , snt.TBELEGARTEN@SIMEX_DB_LINK      bel
+ where cv.COV_CAPTION    not like 'MIG_OOS%'
+   and fzgre.ID_VERTRAG         = fzgvc.ID_VERTRAG
+   and fzgre.ID_FZGVERTRAG      = fzgvc.ID_FZGVERTRAG
+   and cv.ID_COV                = fzgvc.ID_COV
+   and fzgre.ID_IMP_TYPE   not in ( 9, 10 )
+   and fzgre.ID_BELEGART        = bel.ID_BELEGART
+   and 1                        = bel.BELART_SUM_INVOICE
+ order by fzgre.ID_VERTRAG, fzgre.ID_FZGVERTRAG, fzgre.ID_SEQ_FZGRECHNUNG</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="WorkshopInvoiceNumber">//invocation/parameter/@externalId</OwnKey>
+			<RemoteKey name="FinancialDocumentIssuer" xpath="//invocation/parameter/financialDocumentIssuer/@externalId" type="'partner_pl:OrganisationalPersonType'">
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="Workshop" key="PartnerId"/>
+					<FK name="createOrganisationalPerson" type="Supplier" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VehicleContractNumber" xpath="//invocation/parameter[2]/costDamageCoverage/@vehicleContractNumber" type="'contract_pl:VehicleContractType'">
+				<Type name="contract_pl:VehicleContractType">
+					<FK name="createVehicleContract" type="NONE" key="VehicleContractNumber"/>
+					<FK name="createCustomerContract" type="FullServiceContract" key="VehicleContractNumber"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VIN" xpath="//invocation/parameter/costDamageCoverage/@vin" type="'UNDEFINED'">
+				<Type name="UNDEFINED">
+					<FK name="createFinList" type="NONE" key="FIN"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createCustomerFinancialDocument">
+		<ExtractFileType>XML</ExtractFileType>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select
+  cinv.GUID_CI
+from
+  snt.TCUSTOMER_INVOICE cinv
+  , snt.TFZGV_CONTRACTS fzgvc
+  , snt.TDFCONTR_VARIANT cv
+where
+  cv.COV_CAPTION not like 'MIG_OOS%'
+  and cv.ID_COV = fzgvc.ID_COV
+  and cinv.ID_SEQ_FZGVC = fzgvc.ID_SEQ_FZGVC
+  -- pck_calculation.get_REVENUE_AMOUNT( I_GUID_CI =&gt; cinv.GUID_CI , I_VAT =&gt; 1 ) &lt;&gt; 0
+  -- replaced this function with its base functionality because it is unbearable slow
+  and ( SELECT SUM(cip_amount)
+        FROM snt.TCUSTOMER_INVOICE_POS cip
+       WHERE cip.GUID_CI = cinv.GUID_CI) &lt;&gt; 0
+order by
+  GUID_CI</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="CustomerInvoiceNumber">//invocation/parameter/@externalId</OwnKey>
+			<RemoteKey name="InvoiceReceiver" xpath="//invocation/parameter/financialDocumentReceiver/@externalId" type="//invocation/parameter/financialDocumentReceiver/@xsi:type">
+				<Type name="partner_pl:PhysicalPersonType">
+					<FK name="createPhysicalPerson" type="PrivateCustomer" key="PartnerId"/>
+				</Type>
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="CommercialCustomer" key="PartnerId"/>
+					<FK name="createOrganisationalPerson" type="Dealer" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VehicleContractNumber" xpath="//invocation/parameter[4]" type="'contract_pl:VehiclerContractType'">
+				<Type name="contract_pl:VehiclerContractType">
+					<FK name="createVehicleContract" type="NONE" key="VehicleContractNumber"/>
+					<FK name="createCustomerContract" type="FullServiceContract" key="VehicleContractNumber"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createCollectiveWorkshopFinancialDocument">
+		<ExtractFileType>XML</ExtractFileType>
+		<ValidationXPath>//invocation/parameter/cost/@externalId</ValidationXPath>
+		<ValidationSQL>select spci.SPCI_DOCUMENT_NUMBER          || '_' ||
+         gar.GAR_GARNOVEGA                  || '_' ||
+         to_char ( spci.SPCI_DATE, 'YYYY' ) || '_' ||
+         decode ( bel.BELART_INVOICE_OR_CNOTE, 0, 'I', 1, 'C', null ) || '_' ||
+         fzgre.ID_SEQ_FZGRECHNUNG
+    from snt.TSP_COLLECTIVE_INVOICE@simex_db_link  spci
+       , snt.TFZGRECHNUNG@simex_db_link            fzgre
+       , snt.TFZGV_CONTRACTS@simex_db_link         fzgvc
+       , snt.TDFCONTR_VARIANT@simex_db_link        cv
+       , snt.TBELEGARTEN@simex_db_link             bel
+       , snt.TPARTNER@simex_db_link                par
+       , snt.TGARAGE@simex_db_link                 gar
+   where cv.COV_CAPTION          not like 'MIG_OOS%'
+     and cv.ID_COV                 = fzgvc.ID_COV
+     and fzgre.ID_VERTRAG          = fzgvc.ID_VERTRAG
+     and fzgre.ID_FZGVERTRAG       = fzgvc.ID_FZGVERTRAG
+     and fzgre.ID_IMP_TYPE       not in ( 9, 10 )
+     and fzgre.ID_BELEGART         = bel.ID_BELEGART
+     and 1                         = bel.BELART_SUM_INVOICE
+     and fzgre.GUID_SPCI           = spci.GUID_SPCI
+     and par.GUID_PARTNER          = spci.GUID_PARTNER
+     and par.ID_GARAGE             = gar.ID_GARAGE
+     and exists ( select null
+                    from snt.TFZGRECHNUNG@simex_db_link  fzgre1
+                   where fzgre.GUID_SPCI = fzgre1.GUID_SPCI
+                  having count ( * ) > 1 )
+order by 1</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="CostCollectiveNumber">//invocation/parameter/@externalId</OwnKey>
+			<RemoteKey name="FinancialDocumentCostIssuer" xpath="//cost/financialDocumentIssuer/@externalId" type="'partner_pl:OrganisationalPersonType'">
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="Supplier" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="FinancialDocumentIssuer" xpath="//invocation/parameter/financialDocumentIssuer/@externalId" type="'partner_pl:OrganisationalPersonType'">
+				<Type name="partner_pl:OrganisationalPersonType">
+					<FK name="createOrganisationalPerson" type="Supplier" key="PartnerId"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VehicleContractNumber" xpath="//invocation/parameter/costCoverage/costDamageCoverageCollection/costDamageCoverage/@vehicleContractNumber" type="'contract_pl:VehiclerContractType'">
+				<Type name="contract_pl:VehiclerContractType">
+					<FK name="createVehicleContract" type="NONE" key="VehicleContractNumber"/>
+					<FK name="createCustomerContract" type="FullServiceContract" key="VehicleContractNumber"/>
+				</Type>
+			</RemoteKey>
+			<RemoteKey name="VIN" xpath="//invocation/parameter/costCoverage/costDamageCoverageCollection/costDamageCoverage/@vin" type="'UNDEFINED'">
+				<Type name="UNDEFINED">
+					<FK name="createFinList" type="NONE" key="FIN"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="assignCostToCost">
+		<ExtractFileType>XML</ExtractFileType>
+		<ValidationXPath>//invocation/parameter[1]/@externalId</ValidationXPath>
+		<ValidationSQL>select ID_SEQ_FZGRECHNUNG
+                         from snt.TFZGRECHNUNG@simex_db_link     fzgre
+                            , snt.TFZGV_CONTRACTS@simex_db_link  fzgvc
+                            , snt.TDFCONTR_VARIANT@simex_db_link cv
+                            , snt.TBELEGARTEN@simex_db_link      bel
+                        where cv.COV_CAPTION        not like 'MIG_OOS%'
+                          and cv.ID_COV                    = fzgvc.ID_COV
+                          and fzgre.FZGRE_REFERENZBUCHUNG is not null
+                          and fzgre.ID_VERTRAG             = fzgvc.ID_VERTRAG
+                          and fzgre.ID_FZGVERTRAG          = fzgvc.ID_FZGVERTRAG
+                          and fzgre.ID_IMP_TYPE       not in ( 9, 10 )
+                          and fzgre.ID_BELEGART            = bel.ID_BELEGART
+                          and 1                            = bel.BELART_SUM_INVOICE
+                          and 1                            = bel.BELART_INVOICE_OR_CNOTE
+                          and fzgre.FZGRE_RESUMME         &lt;&gt; 0
+                          and exists ( select null from snt.TFZGRECHNUNG@simex_db_link fzgre1
+                                        where fzgre1.ID_SEQ_FZGRECHNUNG   = fzgre.FZGRE_REFERENZBUCHUNG
+                                          and fzgre1.FZGRE_SUM_REJECTED   = fzgre.FZGRE_RESUMME )
+                   order by 1</ValidationSQL>
+		<ValidationIntegrity>
+			<RemoteKey name="ReferencedCost" xpath="//invocation/parameter/@externalId" type="'cost_pl:CostType'">
+				<Type name="cost_pl:CostType">
+					<FK name="createWorkshopFinancialDocument" type="NONE" key="WorkshopInvoiceNumber"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createModificationProtocolEntry">
+		<ExtractFileType>XML</ExtractFileType>
+		<ValidationXPath>//invocation/parameter/@externalId</ValidationXPath>
+		<ValidationSQL>select extcos.GUID_EXTCOS
+  from snt.TEXT_COS_LASTCHANGE@SIMEX_DB_LINK  extcos
+     , snt.TFZGVERTRAG@SIMEX_DB_LINK          fzgv
+     , snt.TFZGV_CONTRACTS@SIMEX_DB_LINK      fzgvc
+     , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK     cov
+ where fzgv.GUID_CONTRACT     = extcos.GUID_CONTRACT
+   and fzgv.ID_VERTRAG        = fzgvc.ID_VERTRAG
+   and fzgv.ID_FZGVERTRAG     = fzgvc.ID_FZGVERTRAG
+   and cov.ID_COV             = fzgvc.ID_COV
+   and cov.COV_CAPTION not like 'MIG_OOS%'
+ union
+select fzgv.ID_VERTRAG || '/' || fzgv.ID_FZGVERTRAG || '_Modification'
+  from snt.TFZGVERTRAG@SIMEX_DB_LINK       fzgv
+     , snt.TFZGV_CONTRACTS@SIMEX_DB_LINK   fzgvc
+     , snt.TDFCONTR_VARIANT@SIMEX_DB_LINK  cov
+ where fzgv.ID_VERTRAG        = fzgvc.ID_VERTRAG
+   and fzgv.ID_FZGVERTRAG     = fzgvc.ID_FZGVERTRAG
+   and cov.ID_COV             = fzgvc.ID_COV
+   and cov.COV_CAPTION not like 'MIG_OOS%'
+order by 1</ValidationSQL>
+		<ValidationIntegrity>
+			<RemoteKey name="VehicleContractNumber" xpath="//invocation/parameter/@objectKey" type="'contract_pl:VehiclerContractType'">
+				<Type name="contract_pl:VehiclerContractType">
+					<FK name="createVehicleContract" type="NONE" key="VehicleContractNumber"/>
+					<FK name="createCustomerContract" type="FullServiceContract" key="VehicleContractNumber"/>
+				</Type>
+			</RemoteKey>
+		</ValidationIntegrity>
+	</operation>
+	<operation name="createFinList">
+		<ExtractFileType>CSV</ExtractFileType>
+		<ValidationXPath>CSV:DELIMIT:;:NAME:VIN</ValidationXPath>
+		<ValidationSQL>select 1 from dual</ValidationSQL>
+		<ValidationIntegrity>
+			<OwnKey name="FIN">CSV:DELIMIT:;:NAME:VIN</OwnKey>
+		</ValidationIntegrity>
+	</operation>
+</ICON-Validation>

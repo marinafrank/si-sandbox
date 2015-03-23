@@ -1,0 +1,43 @@
+===========================================================================
+= SIRIUS Spool-Script for MKS-121059                                      =
+===========================================================================
+
+Date         : 31.12.2012
+Author       : FraBe
+
+Precondition : sirius 2.8.0 or higher
+
+===========================================================================
+= Description                                                             =
+===========================================================================
+
+Reports all contracts with the same 
+1) ID Customer Contract
+2) META Package - Line
+3) Contracting Workshop
+4) Vehicle Type
+5) Business Area Level 1 to 3
+6) SCARF Category
+and all of their Vehicle Contract IDs
+
+But only if there exists more than 1 contract with the same value listed in 1) to 6).
+
+And only those contracts are reported which are not marked OutOfScope
+===========================================================================
+= To do´s                                                                 =
+===========================================================================
+
+Step 1:  open commdand window
+
+Step 2:  go to your working folder
+
+Step 3:  start sqlplus as user snt
+
+Step 4:  SQL > @20121229_showGroupsInVehicleContracts_V1.0.sql
+
+Step 5:  check the generated log file 
+         20121229_showGroupsInVehicleContracts_V1.0.log in your working folder.
+         If there are entries containing ORA- and SP2- please contact the
+         SIRIUS technical support. 
+
+For questions and feedback please also contact the SIRIUS technical support.

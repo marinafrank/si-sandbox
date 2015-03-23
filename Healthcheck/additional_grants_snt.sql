@@ -1,0 +1,9 @@
+grant select on tsp_contract to ssi;
+grant select on tsp_collective_invoice to ssi;
+grant select on titem_hist_price to ssi;
+grant select on titem to ssi;
+grant select on tco_substitute to ssi;
+grant select on tcos_pricing to ssi;
+grant select on tcontract_subsidizing to ssi;
+grant select on tcontract_campaign to ssi;
+grant select on tcampaign to ssi;

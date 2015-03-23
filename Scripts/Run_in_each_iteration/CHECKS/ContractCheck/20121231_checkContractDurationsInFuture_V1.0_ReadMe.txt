@@ -1,0 +1,35 @@
+===========================================================================
+= SIRIUS Spool-Script for MKS-121064                                      =
+===========================================================================
+
+Date         : 31.12.2012
+Author       : FraBe
+
+Precondition : sirius 2.8.0 or higher
+
+===========================================================================
+= Description                                                             =
+===========================================================================
+
+Reports all contracts with future begin date
+(-> future begin date means: at the date when the script is executed )
+
+Only those contracts are reported which are not marked OutOfScope
+===========================================================================
+= To do´s                                                                 =
+===========================================================================
+
+Step 1:  open commdand window
+
+Step 2:  go to your working folder
+
+Step 3:  start sqlplus as user snt
+
+Step 4:  SQL > @20121231_checkContractDurationsInFuture_V1.0.sql
+
+Step 5:  check the generated log file 
+         20121231_checkContractDurationsInFuture_V1.0.log in your working folder.
+         If there are entries containing ORA- and SP2- please contact the
+         SIRIUS technical support. 
+
+For questions and feedback please also contact the SIRIUS technical support.
